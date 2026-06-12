@@ -1,11 +1,8 @@
-# System Architecture
-
-```text
 Resume Upload
       ↓
 Resume Parser
       ↓
-Skill Extraction
+Skill Extractor
       ↓
 Job Requirement Analyzer
       ↓
@@ -15,5 +12,4 @@ Roadmap Generator
       ↓
 Progress Tracker
       ↓
-Adaptive Recommendations
-```
+Adaptive Career Coach
