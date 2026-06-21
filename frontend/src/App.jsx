@@ -7,6 +7,8 @@ function App() {
   const [role, setRole] = useState("AI Engineer");
   const [result, setResult] = useState(null);
   const [roadmap, setRoadmap] = useState(null);
+  const [learningPlan, setLearningPlan] = useState(null);
+  const [projects, setProjects] = useState(null);
 
   const analyzeResume = async () => {
     if (!file) {
@@ -26,7 +28,7 @@ function App() {
 
       const filename = uploadResponse.data.filename;
 
-      // Skill Gap Analysis
+      // Skill Gap
       const gapResponse = await axios.get(
         "http://127.0.0.1:8000/skill-gap",
         {
@@ -52,8 +54,31 @@ function App() {
 
       setRoadmap(roadmapResponse.data);
 
-      console.log(gapResponse.data);
-      console.log(roadmapResponse.data);
+      // Learning Plan
+      const learningResponse = await axios.get(
+        "http://127.0.0.1:8000/learning-plan",
+        {
+          params: {
+            filename,
+            role,
+          },
+        }
+      );
+
+      setLearningPlan(learningResponse.data);
+
+      // Project Recommendations
+      const projectResponse = await axios.get(
+        "http://127.0.0.1:8000/project-recommendations",
+        {
+          params: {
+            filename,
+            role,
+          },
+        }
+      );
+
+      setProjects(projectResponse.data);
 
     } catch (error) {
       console.log(error);
@@ -115,6 +140,48 @@ function App() {
                   className="roadmap-item"
                 >
                   <b>{week}</b> → {skill}
+                </div>
+              )
+            )
+          }
+
+          <h2>Learning Resources</h2>
+
+          {learningPlan &&
+            Object.entries(learningPlan).map(
+              ([week, details]) => (
+                <div
+                  key={week}
+                  className="roadmap-item"
+                >
+                  <h4>
+                    {week} - {details.skill}
+                  </h4>
+
+                  <ul className="skills-list">
+                    {details.resources.map(
+                      (resource, index) => (
+                        <li key={index}>
+                          {resource}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </div>
+              )
+            )
+          }
+
+          <h2>Recommended Projects</h2>
+
+          {projects &&
+            projects.recommended_projects.map(
+              (project, index) => (
+                <div
+                  key={index}
+                  className="roadmap-item"
+                >
+                  {project}
                 </div>
               )
             )
