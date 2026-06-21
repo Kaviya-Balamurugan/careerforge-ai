@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "./App.css";
+import { jsPDF } from "jspdf";
 
 function App() {
   const [file, setFile] = useState(null);
@@ -85,6 +86,77 @@ function App() {
       alert("Error analyzing resume");
     }
   };
+  const downloadReport = () => {
+  const doc = new jsPDF();
+
+  let y = 20;
+
+  doc.setFontSize(18);
+  doc.text("CareerForge AI Report", 20, y);
+
+  y += 15;
+
+  doc.setFontSize(12);
+
+  doc.text(`Target Role: ${role}`, 20, y);
+
+  y += 10;
+
+  doc.text(
+    `Readiness Score: ${result.readiness_score}%`,
+    20,
+    y
+  );
+
+  y += 15;
+
+  doc.text("Missing Skills:", 20, y);
+
+  y += 10;
+
+  result.missing_skills.forEach((skill) => {
+    doc.text(`• ${skill}`, 25, y);
+    y += 8;
+  });
+
+  y += 5;
+
+  doc.text("Learning Roadmap:", 20, y);
+
+  y += 10;
+
+  Object.entries(roadmap.roadmap).forEach(
+    ([week, skill]) => {
+      doc.text(
+        `${week} -> ${skill}`,
+        25,
+        y
+      );
+      y += 8;
+    }
+  );
+
+  y += 5;
+
+  doc.text("Recommended Projects:", 20, y);
+
+  y += 10;
+
+  if (projects) {
+    projects.recommended_projects.forEach(
+      (project) => {
+        doc.text(
+          `• ${project}`,
+          25,
+          y
+        );
+        y += 8;
+      }
+    );
+  }
+
+  doc.save("CareerForge_Report.pdf");
+};
 
   return (
     <div className="container">
@@ -119,8 +191,17 @@ function App() {
           <h2>Readiness Score</h2>
 
           <p className="score">
-            {result.readiness_score}%
-          </p>
+  {result.readiness_score}%
+</p>
+
+<div className="progress-container">
+  <div
+    className="progress-bar"
+    style={{
+      width: `${result.readiness_score}%`
+    }}
+  ></div>
+</div>
 
           <h2>Missing Skills</h2>
 
@@ -186,12 +267,18 @@ function App() {
               )
             )
           }
+          <br />
+
+<button onClick={downloadReport}>
+  Download Career Report
+</button>
 
         </div>
       )}
 
     </div>
   );
+  
 }
 
 export default App;
