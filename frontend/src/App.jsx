@@ -1,22 +1,20 @@
 import { useState } from "react";
 import axios from "axios";
+import "./App.css";
 
 function App() {
-
   const [file, setFile] = useState(null);
   const [role, setRole] = useState("AI Engineer");
   const [result, setResult] = useState(null);
   const [roadmap, setRoadmap] = useState(null);
 
   const analyzeResume = async () => {
-
     if (!file) {
       alert("Please select a resume");
       return;
     }
 
     try {
-
       const formData = new FormData();
       formData.append("file", file);
 
@@ -33,9 +31,9 @@ function App() {
         "http://127.0.0.1:8000/skill-gap",
         {
           params: {
-            filename: filename,
-            role: role
-          }
+            filename,
+            role,
+          },
         }
       );
 
@@ -46,9 +44,9 @@ function App() {
         "http://127.0.0.1:8000/roadmap",
         {
           params: {
-            filename: filename,
-            role: role
-          }
+            filename,
+            role,
+          },
         }
       );
 
@@ -59,46 +57,49 @@ function App() {
 
     } catch (error) {
       console.log(error);
+      alert("Error analyzing resume");
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>CareerForge AI</h1>
+    <div className="container">
 
-      <input
-        type="file"
-        onChange={(e) => setFile(e.target.files[0])}
-      />
+      <h1 className="title">CareerForge AI</h1>
 
-      <br /><br />
+      <div className="card upload-section">
 
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-      >
-        <option>AI Engineer</option>
-        <option>Data Scientist</option>
-        <option>Full Stack Developer</option>
-      </select>
+        <input
+          type="file"
+          onChange={(e) => setFile(e.target.files[0])}
+        />
 
-      <br /><br />
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <option>AI Engineer</option>
+          <option>Data Scientist</option>
+          <option>Full Stack Developer</option>
+        </select>
 
-      <button onClick={analyzeResume}>
-        Analyze
-      </button>
+        <button onClick={analyzeResume}>
+          Analyze Resume
+        </button>
 
-      <br /><br />
+      </div>
 
       {result && (
-        <div>
+        <div className="card">
 
           <h2>Readiness Score</h2>
-          <p>{result.readiness_score}%</p>
+
+          <p className="score">
+            {result.readiness_score}%
+          </p>
 
           <h2>Missing Skills</h2>
 
-          <ul>
+          <ul className="skills-list">
             {result.missing_skills.map((skill, index) => (
               <li key={index}>{skill}</li>
             ))}
@@ -109,15 +110,19 @@ function App() {
           {roadmap &&
             Object.entries(roadmap.roadmap).map(
               ([week, skill]) => (
-                <p key={week}>
+                <div
+                  key={week}
+                  className="roadmap-item"
+                >
                   <b>{week}</b> → {skill}
-                </p>
+                </div>
               )
             )
           }
 
         </div>
       )}
+
     </div>
   );
 }
