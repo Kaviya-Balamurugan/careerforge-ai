@@ -1,0 +1,16 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# Uploads
+backend/uploads/
+
+# Node
+node_modules/
+
+# Build
+dist/
