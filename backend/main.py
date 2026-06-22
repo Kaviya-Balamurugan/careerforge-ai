@@ -10,7 +10,8 @@ from backend.app.services.roadmap_generator import generate_roadmap
 from backend.app.services.resource_recommender import get_resources
 from backend.app.services.project_recommender import get_projects
 from fastapi.middleware.cors import CORSMiddleware
-
+from backend.app.services.career_summary import generate_career_summary
+from backend.app.services.job_recommender import get_job_recommendations
 app = FastAPI()
 
 app.add_middleware(
@@ -166,6 +167,7 @@ def project_recommendations(
     filename: str,
     role: str
 ):
+    
 
     file_path = f"backend/uploads/{filename}"
 
@@ -186,4 +188,49 @@ def project_recommendations(
 
     return {
         "recommended_projects": projects
+    }
+
+@app.get("/career-summary")
+def career_summary(
+    filename: str,
+    role: str
+):
+
+    file_path = f"backend/uploads/{filename}"
+
+    resume_text = extract_resume_text(file_path)
+
+    current_skills = extract_skills(resume_text)
+
+    required_skills = get_required_skills(role)
+
+    gap_result = analyze_skill_gap(
+        current_skills,
+        required_skills
+    )
+
+    summary = generate_career_summary(
+        role,
+        gap_result["readiness_score"],
+        gap_result["matched_skills"],
+        gap_result["missing_skills"]
+    )
+
+    return {
+        "summary": summary
+    }
+
+@app.get("/job-recommendations")
+def job_recommendations(filename: str):
+
+    file_path = f"backend/uploads/{filename}"
+
+    resume_text = extract_resume_text(file_path)
+
+    current_skills = extract_skills(resume_text)
+
+    jobs = get_job_recommendations(current_skills)
+
+    return {
+        "jobs": jobs
     }

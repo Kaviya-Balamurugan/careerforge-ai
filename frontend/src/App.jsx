@@ -6,10 +6,13 @@ import { jsPDF } from "jspdf";
 function App() {
   const [file, setFile] = useState(null);
   const [role, setRole] = useState("AI Engineer");
+
   const [result, setResult] = useState(null);
   const [roadmap, setRoadmap] = useState(null);
   const [learningPlan, setLearningPlan] = useState(null);
   const [projects, setProjects] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [jobs, setJobs] = useState(null);
 
   const analyzeResume = async () => {
     if (!file) {
@@ -81,134 +84,150 @@ function App() {
 
       setProjects(projectResponse.data);
 
+      // Career Summary
+      const summaryResponse = await axios.get(
+        "http://127.0.0.1:8000/career-summary",
+        {
+          params: {
+            filename,
+            role,
+          },
+        }
+      );
+
+      setSummary(summaryResponse.data);
+
+      const jobsResponse = await axios.get(
+  "http://127.0.0.1:8000/job-recommendations",
+  {
+    params: {
+      filename,
+    },
+  }
+);
+
+setJobs(jobsResponse.data);
+
     } catch (error) {
       console.log(error);
       alert("Error analyzing resume");
     }
   };
+
   const downloadReport = () => {
-  const doc = new jsPDF();
+    if (!result) return;
 
-  let y = 20;
+    const doc = new jsPDF();
 
-  doc.setFontSize(18);
-  doc.text("CareerForge AI Report", 20, y);
+    let y = 20;
 
-  y += 15;
+    doc.setFontSize(18);
+    doc.text("CareerForge AI Report", 20, y);
 
-  doc.setFontSize(12);
+    y += 15;
 
-  doc.text(`Target Role: ${role}`, 20, y);
+    doc.setFontSize(12);
+    doc.text(`Target Role: ${role}`, 20, y);
 
-  y += 10;
+    y += 10;
 
-  doc.text(
-    `Readiness Score: ${result.readiness_score}%`,
-    20,
-    y
-  );
-
-  y += 15;
-
-  doc.text("Missing Skills:", 20, y);
-
-  y += 10;
-
-  result.missing_skills.forEach((skill) => {
-    doc.text(`• ${skill}`, 25, y);
-    y += 8;
-  });
-
-  y += 5;
-
-  doc.text("Learning Roadmap:", 20, y);
-
-  y += 10;
-
-  Object.entries(roadmap.roadmap).forEach(
-    ([week, skill]) => {
-      doc.text(
-        `${week} -> ${skill}`,
-        25,
-        y
-      );
-      y += 8;
-    }
-  );
-
-  y += 5;
-
-  doc.text("Recommended Projects:", 20, y);
-
-  y += 10;
-
-  if (projects) {
-    projects.recommended_projects.forEach(
-      (project) => {
-        doc.text(
-          `• ${project}`,
-          25,
-          y
-        );
-        y += 8;
-      }
+    doc.text(
+      `Readiness Score: ${result.readiness_score}%`,
+      20,
+      y
     );
-  }
 
-  doc.save("CareerForge_Report.pdf");
-};
+    y += 15;
+
+    doc.text("Missing Skills:", 20, y);
+
+    y += 10;
+
+    result.missing_skills.forEach((skill) => {
+      doc.text(`• ${skill}`, 25, y);
+      y += 8;
+    });
+
+    y += 5;
+
+    doc.text("Learning Roadmap:", 20, y);
+
+    y += 10;
+
+    if (roadmap) {
+      Object.entries(roadmap.roadmap).forEach(
+        ([week, skill]) => {
+          doc.text(`${week} -> ${skill}`, 25, y);
+          y += 8;
+        }
+      );
+    }
+
+    y += 5;
+
+    doc.text("Recommended Projects:", 20, y);
+
+    y += 10;
+
+    if (projects) {
+      projects.recommended_projects.forEach(
+        (project) => {
+          doc.text(`• ${project}`, 25, y);
+          y += 8;
+        }
+      );
+    }
+
+    doc.save("CareerForge_Report.pdf");
+  };
 
   return (
     <div className="container">
-
       <h1 className="title">CareerForge AI</h1>
 
       <div className="card upload-section">
-
         <input
           type="file"
           onChange={(e) => setFile(e.target.files[0])}
         />
 
-        <select
+        <input
+          type="text"
+          placeholder="Enter Target Role"
           value={role}
           onChange={(e) => setRole(e.target.value)}
-        >
-          <option>AI Engineer</option>
-          <option>Data Scientist</option>
-          <option>Full Stack Developer</option>
-        </select>
+        />
 
         <button onClick={analyzeResume}>
           Analyze Resume
         </button>
-
       </div>
 
       {result && (
         <div className="card">
-
           <h2>Readiness Score</h2>
 
           <p className="score">
-  {result.readiness_score}%
-</p>
+            {result.readiness_score}%
+          </p>
 
-<div className="progress-container">
-  <div
-    className="progress-bar"
-    style={{
-      width: `${result.readiness_score}%`
-    }}
-  ></div>
-</div>
+          <div className="progress-container">
+            <div
+              className="progress-bar"
+              style={{
+                width: `${result.readiness_score}%`,
+              }}
+            ></div>
+          </div>
 
           <h2>Missing Skills</h2>
 
           <ul className="skills-list">
-            {result.missing_skills.map((skill, index) => (
-              <li key={index}>{skill}</li>
-            ))}
+            {result.missing_skills.map(
+              (skill, index) => (
+                <li key={index}>{skill}</li>
+              )
+            )}
           </ul>
 
           <h2>Learning Roadmap</h2>
@@ -223,8 +242,7 @@ function App() {
                   <b>{week}</b> → {skill}
                 </div>
               )
-            )
-          }
+            )}
 
           <h2>Learning Resources</h2>
 
@@ -250,8 +268,7 @@ function App() {
                   </ul>
                 </div>
               )
-            )
-          }
+            )}
 
           <h2>Recommended Projects</h2>
 
@@ -265,20 +282,38 @@ function App() {
                   {project}
                 </div>
               )
-            )
-          }
+            )}
+
+          <h2>Career Summary</h2>
+
+          {summary && (
+            <div className="roadmap-item">
+              {summary.summary}
+            </div>
+          )}
+
+          <h2>Recommended Jobs</h2>
+
+{jobs &&
+  jobs.jobs.map((job, index) => (
+    <div
+      key={index}
+      className="roadmap-item"
+    >
+      <b>{job.role}</b> - Match Score: {job.match}
+    </div>
+  ))
+}
+
           <br />
 
-<button onClick={downloadReport}>
-  Download Career Report
-</button>
-
+          <button onClick={downloadReport}>
+            Download Career Report
+          </button>
         </div>
       )}
-
     </div>
   );
-  
 }
 
 export default App;
