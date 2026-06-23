@@ -15,6 +15,7 @@ function App() {
   const [jobs, setJobs] = useState(null);
   const [suggestions, setSuggestions] = useState(null);
   const [ats, setAts] = useState(null);
+  const [interviewQuestions, setInterviewQuestions] = useState(null);
 
   const analyzeResume = async () => {
     if (!file) {
@@ -122,6 +123,19 @@ function App() {
       );
 
       setSuggestions(suggestionResponse.data);
+
+      const interviewResponse = await axios.get(
+  "http://127.0.0.1:8000/interview-questions",
+  {
+    params: {
+      role,
+    },
+  }
+);
+
+setInterviewQuestions(
+  interviewResponse.data
+);
       const atsResponse = await axios.get(
   "http://127.0.0.1:8000/ats-score",
   {
@@ -221,6 +235,32 @@ setAts(atsResponse.data);
         }
       );
     }
+
+    y += 10;
+
+doc.text(
+  "Interview Questions:",
+  20,
+  y
+);
+
+y += 10;
+
+if (interviewQuestions) {
+
+  interviewQuestions.questions.forEach(
+    (question) => {
+
+      doc.text(
+        `• ${question}`,
+        25,
+        y
+      );
+
+      y += 8;
+    }
+  );
+}
 
     doc.save("CareerForge_Report.pdf");
   };
@@ -406,6 +446,21 @@ setAts(atsResponse.data);
             ))}
 
           <br />
+
+          <h2>Interview Questions</h2>
+
+{interviewQuestions &&
+  interviewQuestions.questions.map(
+    (question, index) => (
+      <div
+        key={index}
+        className="roadmap-item"
+      >
+        <b>Q{index + 1}.</b> {question}
+      </div>
+    )
+  )
+}
 
           <button onClick={downloadReport}>
             Download Career Report

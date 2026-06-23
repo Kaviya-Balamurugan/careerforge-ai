@@ -14,6 +14,7 @@ from backend.app.services.career_summary import generate_career_summary
 from backend.app.services.job_recommender import get_job_recommendations
 from backend.app.services.resume_improver import get_resume_suggestions
 from backend.app.services.ats_analyzer import analyze_ats
+from backend.app.services.interview_generator import generate_questions
 app = FastAPI()
 
 app.add_middleware(
@@ -279,3 +280,12 @@ def ats_score(filename: str):
     result = analyze_ats(resume_text)
 
     return result
+
+@app.get("/interview-questions")
+def interview_questions(role: str):
+
+    questions = generate_questions(role)
+
+    return {
+        "questions": questions
+    }
