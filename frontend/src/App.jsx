@@ -14,6 +14,7 @@ function App() {
   const [summary, setSummary] = useState(null);
   const [jobs, setJobs] = useState(null);
   const [suggestions, setSuggestions] = useState(null);
+  const [ats, setAts] = useState(null);
 
   const analyzeResume = async () => {
     if (!file) {
@@ -121,6 +122,16 @@ function App() {
       );
 
       setSuggestions(suggestionResponse.data);
+      const atsResponse = await axios.get(
+  "http://127.0.0.1:8000/ats-score",
+  {
+    params: {
+      filename,
+    },
+  }
+);
+
+setAts(atsResponse.data);
 
     } catch (error) {
       console.log(error);
@@ -321,6 +332,44 @@ function App() {
               )
             )}
 
+            <h2>ATS Score</h2>
+
+{ats && (
+  <>
+    <p className="score">
+      {ats.ats_score}%
+    </p>
+
+    <div className="progress-container">
+      <div
+        className="progress-bar"
+        style={{
+          width: `${ats.ats_score}%`,
+        }}
+      ></div>
+    </div>
+
+    <h3>ATS Suggestions</h3>
+
+    {ats.suggestions.length === 0 ? (
+      <div className="roadmap-item">
+        Excellent Resume! ATS Friendly.
+      </div>
+    ) : (
+      ats.suggestions.map(
+        (suggestion, index) => (
+          <div
+            key={index}
+            className="roadmap-item"
+          >
+            {suggestion}
+          </div>
+        )
+      )
+    )}
+  </>
+)}
+
           <h2>Career Summary</h2>
 
           {summary && (
@@ -352,7 +401,7 @@ function App() {
                 className="roadmap-item"
               >
                 <b>{job.role}</b> - Match Score:{" "}
-                {job.match}%
+                {job.match}
               </div>
             ))}
 

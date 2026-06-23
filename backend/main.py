@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app.services.career_summary import generate_career_summary
 from backend.app.services.job_recommender import get_job_recommendations
 from backend.app.services.resume_improver import get_resume_suggestions
+from backend.app.services.ats_analyzer import analyze_ats
 app = FastAPI()
 
 app.add_middleware(
@@ -267,3 +268,14 @@ def resume_suggestions(
     return {
         "suggestions": suggestions
     }
+
+@app.get("/ats-score")
+def ats_score(filename: str):
+
+    file_path = f"backend/uploads/{filename}"
+
+    resume_text = extract_resume_text(file_path)
+
+    result = analyze_ats(resume_text)
+
+    return result
