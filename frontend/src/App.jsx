@@ -13,6 +13,7 @@ function App() {
   const [projects, setProjects] = useState(null);
   const [summary, setSummary] = useState(null);
   const [jobs, setJobs] = useState(null);
+  const [suggestions, setSuggestions] = useState(null);
 
   const analyzeResume = async () => {
     if (!file) {
@@ -24,7 +25,6 @@ function App() {
       const formData = new FormData();
       formData.append("file", file);
 
-      // Upload Resume
       const uploadResponse = await axios.post(
         "http://127.0.0.1:8000/upload-resume",
         formData
@@ -71,7 +71,7 @@ function App() {
 
       setLearningPlan(learningResponse.data);
 
-      // Project Recommendations
+      // Projects
       const projectResponse = await axios.get(
         "http://127.0.0.1:8000/project-recommendations",
         {
@@ -97,16 +97,30 @@ function App() {
 
       setSummary(summaryResponse.data);
 
+      // Jobs
       const jobsResponse = await axios.get(
-  "http://127.0.0.1:8000/job-recommendations",
-  {
-    params: {
-      filename,
-    },
-  }
-);
+        "http://127.0.0.1:8000/job-recommendations",
+        {
+          params: {
+            filename,
+          },
+        }
+      );
 
-setJobs(jobsResponse.data);
+      setJobs(jobsResponse.data);
+
+      // Resume Suggestions
+      const suggestionResponse = await axios.get(
+        "http://127.0.0.1:8000/resume-suggestions",
+        {
+          params: {
+            filename,
+            role,
+          },
+        }
+      );
+
+      setSuggestions(suggestionResponse.data);
 
     } catch (error) {
       console.log(error);
@@ -148,7 +162,7 @@ setJobs(jobsResponse.data);
       y += 8;
     });
 
-    y += 5;
+    y += 10;
 
     doc.text("Learning Roadmap:", 20, y);
 
@@ -163,7 +177,7 @@ setJobs(jobsResponse.data);
       );
     }
 
-    y += 5;
+    y += 10;
 
     doc.text("Recommended Projects:", 20, y);
 
@@ -173,6 +187,25 @@ setJobs(jobsResponse.data);
       projects.recommended_projects.forEach(
         (project) => {
           doc.text(`• ${project}`, 25, y);
+          y += 8;
+        }
+      );
+    }
+
+    y += 10;
+
+    doc.text(
+      "Resume Improvement Suggestions:",
+      20,
+      y
+    );
+
+    y += 10;
+
+    if (suggestions) {
+      suggestions.suggestions.forEach(
+        (suggestion) => {
+          doc.text(`• ${suggestion}`, 25, y);
           y += 8;
         }
       );
@@ -188,14 +221,18 @@ setJobs(jobsResponse.data);
       <div className="card upload-section">
         <input
           type="file"
-          onChange={(e) => setFile(e.target.files[0])}
+          onChange={(e) =>
+            setFile(e.target.files[0])
+          }
         />
 
         <input
           type="text"
           placeholder="Enter Target Role"
           value={role}
-          onChange={(e) => setRole(e.target.value)}
+          onChange={(e) =>
+            setRole(e.target.value)
+          }
         />
 
         <button onClick={analyzeResume}>
@@ -292,18 +329,32 @@ setJobs(jobsResponse.data);
             </div>
           )}
 
+          <h2>Resume Improvement Suggestions</h2>
+
+          {suggestions &&
+            suggestions.suggestions.map(
+              (suggestion, index) => (
+                <div
+                  key={index}
+                  className="roadmap-item"
+                >
+                  {suggestion}
+                </div>
+              )
+            )}
+
           <h2>Recommended Jobs</h2>
 
-{jobs &&
-  jobs.jobs.map((job, index) => (
-    <div
-      key={index}
-      className="roadmap-item"
-    >
-      <b>{job.role}</b> - Match Score: {job.match}
-    </div>
-  ))
-}
+          {jobs &&
+            jobs.jobs.map((job, index) => (
+              <div
+                key={index}
+                className="roadmap-item"
+              >
+                <b>{job.role}</b> - Match Score:{" "}
+                {job.match}%
+              </div>
+            ))}
 
           <br />
 

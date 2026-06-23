@@ -12,6 +12,7 @@ from backend.app.services.project_recommender import get_projects
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.services.career_summary import generate_career_summary
 from backend.app.services.job_recommender import get_job_recommendations
+from backend.app.services.resume_improver import get_resume_suggestions
 app = FastAPI()
 
 app.add_middleware(
@@ -233,4 +234,36 @@ def job_recommendations(filename: str):
 
     return {
         "jobs": jobs
+    }
+
+@app.get("/resume-suggestions")
+def resume_suggestions(
+    filename: str,
+    role: str
+):
+
+    file_path = f"backend/uploads/{filename}"
+
+    resume_text = extract_resume_text(file_path)
+
+    current_skills = extract_skills(
+        resume_text
+    )
+
+    required_skills = get_required_skills(
+        role
+    )
+
+    gap_result = analyze_skill_gap(
+        current_skills,
+        required_skills
+    )
+
+    suggestions = get_resume_suggestions(
+        current_skills,
+        gap_result["missing_skills"]
+    )
+
+    return {
+        "suggestions": suggestions
     }
