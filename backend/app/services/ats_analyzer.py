@@ -1,39 +1,32 @@
+from backend.app.services.ai_service import ask_ai
+import json
+
 def analyze_ats(resume_text):
 
-    score = 100
-    suggestions = []
+    prompt = f"""
+    You are an ATS Resume Analyzer.
 
-    if "github.com" not in resume_text.lower():
-        score -= 10
-        suggestions.append(
-            "Add GitHub profile link"
-        )
+    Analyze this resume:
 
-    if "linkedin.com" not in resume_text.lower():
-        score -= 10
-        suggestions.append(
-            "Add LinkedIn profile link"
-        )
+    {resume_text}
 
-    if "%" not in resume_text:
-        score -= 15
-        suggestions.append(
-            "Add measurable achievements using percentages"
-        )
+    Return ONLY valid JSON:
 
-    if "project" not in resume_text.lower():
-        score -= 15
-        suggestions.append(
-            "Add project section"
-        )
+    {{
+      "ats_score": 0,
+      "suggestions": []
+    }}
+    """
 
-    if "skill" not in resume_text.lower():
-        score -= 10
-        suggestions.append(
-            "Add skills section"
-        )
+    response = ask_ai(prompt)
 
-    return {
-        "ats_score": max(score, 0),
-        "suggestions": suggestions
-    }
+    try:
+        return json.loads(response)
+
+    except:
+        return {
+            "ats_score": 75,
+            "suggestions": [
+                "Unable to analyze ATS score"
+            ]
+        }

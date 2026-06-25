@@ -1,10 +1,17 @@
 import google.generativeai as genai
+from dotenv import load_dotenv
+import os
 import ast
 
-genai.configure(api_key="YOUR_API_KEY")
+load_dotenv()
 
-model = genai.GenerativeModel("gemini-2.0-flash")
+genai.configure(
+    api_key=os.getenv("GEMINI_API_KEY")
+)
 
+model = genai.GenerativeModel(
+    "gemini-2.0-flash"
+)
 
 def get_required_skills(role):
 
@@ -15,9 +22,10 @@ def get_required_skills(role):
     {role}
 
     Return ONLY a Python list
-    of the top 10 technical skills.
+    containing the top 10 technical skills.
 
     Example:
+
     ["Python","SQL","Docker"]
     """
 

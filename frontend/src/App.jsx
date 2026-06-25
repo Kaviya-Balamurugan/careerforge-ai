@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { jsPDF } from "jspdf";
@@ -6,6 +6,7 @@ import { jsPDF } from "jspdf";
 function App() {
   const [file, setFile] = useState(null);
   const [role, setRole] = useState("AI Engineer");
+  const chatEndRef = useRef(null);
 
   const [result, setResult] = useState(null);
   const [roadmap, setRoadmap] = useState(null);
@@ -15,7 +16,26 @@ function App() {
   const [jobs, setJobs] = useState(null);
   const [suggestions, setSuggestions] = useState(null);
   const [ats, setAts] = useState(null);
-  const [interviewQuestions, setInterviewQuestions] = useState(null);
+  const [interviewQuestions, setInterviewQuestions] = useState([]);
+  const [selectedQuestion, setSelectedQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [evaluation, setEvaluation] = useState(null);
+  const [jobDescription, setJobDescription] = useState("");
+  const [jdMatch, setJdMatch] = useState(null);
+  const [chatQuestion, setChatQuestion] = useState("");
+  const [chatResponse, setChatResponse] = useState("");
+  const [uploadedFilename, setUploadedFilename] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
+
+  useEffect(() => {
+
+  chatEndRef.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+
+}, [chatHistory]);
 
   const analyzeResume = async () => {
     if (!file) {
@@ -34,6 +54,7 @@ function App() {
 
       const filename = uploadResponse.data.filename;
 
+      setUploadedFilename(filename);
       // Skill Gap
       const gapResponse = await axios.get(
         "http://127.0.0.1:8000/skill-gap",
@@ -99,32 +120,21 @@ function App() {
 
       setSummary(summaryResponse.data);
 
-      // Jobs
-      const jobsResponse = await axios.get(
-        "http://127.0.0.1:8000/job-recommendations",
-        {
-          params: {
-            filename,
-          },
-        }
-      );
-
-      setJobs(jobsResponse.data);
-
       // Resume Suggestions
-      const suggestionResponse = await axios.get(
-        "http://127.0.0.1:8000/resume-suggestions",
-        {
-          params: {
-            filename,
-            role,
-          },
-        }
-      );
+const suggestionResponse = await axios.get(
+  "http://127.0.0.1:8000/resume-suggestions",
+  {
+    params: {
+      filename,
+      role,
+    },
+  }
+);
 
-      setSuggestions(suggestionResponse.data);
+setSuggestions(suggestionResponse.data);
 
-      const interviewResponse = await axios.get(
+// Interview Questions
+const interviewResponse = await axios.get(
   "http://127.0.0.1:8000/interview-questions",
   {
     params: {
@@ -134,9 +144,19 @@ function App() {
 );
 
 setInterviewQuestions(
-  interviewResponse.data
+  interviewResponse.data.questions
 );
-      const atsResponse = await axios.get(
+
+if (
+  interviewResponse.data.questions.length > 0
+) {
+  setSelectedQuestion(
+    interviewResponse.data.questions[0]
+  );
+}
+
+// ATS Score
+const atsResponse = await axios.get(
   "http://127.0.0.1:8000/ats-score",
   {
     params: {
@@ -147,11 +167,144 @@ setInterviewQuestions(
 
 setAts(atsResponse.data);
 
+// JD Match
+if (jobDescription.trim() !== "") {
+
+  const jdResponse = await axios.post(
+    "http://127.0.0.1:8000/jd-match",
+    null,
+    {
+      params: {
+        filename,
+        job_description: jobDescription,
+      },
+    }
+  );
+
+  setJdMatch(jdResponse.data);
+}
+
     } catch (error) {
       console.log(error);
       alert("Error analyzing resume");
     }
   };
+
+  const generateInterviewQuestions = async () => {
+  try {
+    const response = await axios.get(
+      "http://127.0.0.1:8000/interview-questions",
+      {
+        params: {
+          role,
+        },
+      }
+    );
+
+    setInterviewQuestions(response.data.questions);
+
+    if (response.data.questions.length > 0) {
+      setSelectedQuestion(
+        response.data.questions[0]
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const evaluateAnswer = async () => {
+  try {
+    const response = await axios.post(
+      "http://127.0.0.1:8000/evaluate-answer",
+      null,
+      {
+        params: {
+          question: selectedQuestion,
+          answer: answer,
+        },
+      }
+    );
+
+    setEvaluation(response.data);
+
+  } catch (error) {
+    console.log(error);
+    alert("Failed to evaluate answer");
+  }
+};
+
+const askResumeAI = async () => {
+  setLoading(true);
+  setIsTyping(true);
+  try {
+
+    const response = await axios.post(
+      "http://127.0.0.1:8000/resume-chat",
+      null,
+      {
+        params: {
+          filename: uploadedFilename,
+          question: chatQuestion,
+        },
+      }
+    );
+
+    const aiAnswer = response.data.answer;
+
+setChatResponse(aiAnswer);
+
+setChatHistory((prev) => [
+  ...prev,
+  {
+    question: chatQuestion,
+    answer: aiAnswer,
+  },
+]);
+
+setChatQuestion("");
+setLoading(false);
+setIsTyping(false);
+
+  } catch (error) {
+    console.log(error);
+    alert("AI Assistant Error");
+  }
+};
+
+const quickPrompt = async (prompt) => {
+
+  setLoading(true);
+
+  try {
+
+    const response = await axios.post(
+      "http://127.0.0.1:8000/resume-chat",
+      null,
+      {
+        params: {
+          filename: uploadedFilename,
+          question: prompt,
+        },
+      }
+    );
+
+    setChatHistory((prev) => [
+      ...prev,
+      {
+        question: prompt,
+        answer: response.data.answer,
+      },
+    ]);
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+  setLoading(false);
+};
 
   const downloadReport = () => {
     if (!result) return;
@@ -248,7 +401,7 @@ y += 10;
 
 if (interviewQuestions) {
 
-  interviewQuestions.questions.forEach(
+  interviewQuestions.forEach(
     (question) => {
 
       doc.text(
@@ -262,6 +415,38 @@ if (interviewQuestions) {
   );
 }
 
+y += 10;
+
+doc.text(
+  "Resume vs Job Description Match",
+  20,
+  y
+);
+
+y += 10;
+
+if (jdMatch) {
+
+  doc.text(
+    `Match Score: ${jdMatch.match_score}%`,
+    25,
+    y
+  );
+
+  y += 10;
+
+  jdMatch.missing_skills.forEach(
+    (skill) => {
+      doc.text(
+        `Missing: ${skill}`,
+        25,
+        y
+      );
+
+      y += 8;
+    }
+  );
+}
     doc.save("CareerForge_Report.pdf");
   };
 
@@ -285,6 +470,15 @@ if (interviewQuestions) {
             setRole(e.target.value)
           }
         />
+
+        <textarea
+  rows="6"
+  placeholder="Paste Job Description Here"
+  value={jobDescription}
+  onChange={(e) =>
+    setJobDescription(e.target.value)
+  }
+/>
 
         <button onClick={analyzeResume}>
           Analyze Resume
@@ -410,6 +604,51 @@ if (interviewQuestions) {
   </>
 )}
 
+<h2>Resume vs Job Description Match</h2>
+
+{jdMatch && (
+  <>
+    <p className="score">
+      {jdMatch.match_score}%
+    </p>
+
+    <div className="progress-container">
+      <div
+        className="progress-bar"
+        style={{
+          width: `${jdMatch.match_score}%`,
+        }}
+      ></div>
+    </div>
+
+    <h3>Matched Skills</h3>
+
+    {jdMatch.matched_skills.map(
+      (skill, index) => (
+        <div
+          key={index}
+          className="roadmap-item"
+        >
+          ✅ {skill}
+        </div>
+      )
+    )}
+
+    <h3>Missing Skills</h3>
+
+    {jdMatch.missing_skills.map(
+      (skill, index) => (
+        <div
+          key={index}
+          className="roadmap-item"
+        >
+          ❌ {skill}
+        </div>
+      )
+    )}
+  </>
+)}
+
           <h2>Career Summary</h2>
 
           {summary && (
@@ -450,7 +689,7 @@ if (interviewQuestions) {
           <h2>Interview Questions</h2>
 
 {interviewQuestions &&
-  interviewQuestions.questions.map(
+  interviewQuestions.map(
     (question, index) => (
       <div
         key={index}
@@ -462,6 +701,199 @@ if (interviewQuestions) {
   )
 }
 
+<h2>Mock Interview</h2>
+
+<button
+  onClick={generateInterviewQuestions}
+>
+  Generate Questions
+</button>
+
+<br />
+<br />
+
+{selectedQuestion && (
+  <div className="roadmap-item">
+
+    <h3>Question</h3>
+
+    <p>{selectedQuestion}</p>
+
+    <textarea
+      rows="5"
+      cols="60"
+      placeholder="Enter your answer"
+      value={answer}
+      onChange={(e) =>
+        setAnswer(e.target.value)
+      }
+    />
+
+    <br />
+    <br />
+
+    <button
+      onClick={evaluateAnswer}
+    >
+      Submit Answer
+    </button>
+
+  </div>
+)}
+
+{evaluation && (
+  <div className="roadmap-item">
+
+    <h3>
+      Score: {evaluation.score}/10
+    </h3>
+
+    {evaluation.feedback.map(
+      (item, index) => (
+        <div key={index}>
+          • {item}
+        </div>
+      )
+    )}
+
+  </div>
+)}
+
+<div className="chat-container">
+
+  <div className="chat-box">
+    <div className="quick-actions">
+
+  <button
+    onClick={() =>
+      quickPrompt(
+        "How can I improve my resume?"
+      )
+    }
+  >
+    🚀 Improve Resume
+  </button>
+
+  <button
+    onClick={() =>
+      quickPrompt(
+        "Generate a professional cover letter based on my profile."
+      )
+    }
+  >
+    💼 Cover Letter
+  </button>
+
+  <button
+    onClick={() =>
+      quickPrompt(
+        "Generate a strong LinkedIn headline for me."
+      )
+    }
+  >
+    🔗 LinkedIn Headline
+  </button>
+
+  <button
+    onClick={() =>
+      quickPrompt(
+        "Rewrite my project descriptions professionally."
+      )
+    }
+  >
+    📄 Rewrite Projects
+  </button>
+
+  <button
+    onClick={() =>
+      quickPrompt(
+        "Give me career advice based on my resume."
+      )
+    }
+  >
+    🎯 Career Advice
+  </button>
+
+</div>
+
+    <div className="chat-title">
+      🤖 CareerForge AI Assistant
+    </div>
+
+    <textarea
+  className="chat-input"
+  placeholder="Ask anything about your resume..."
+  value={chatQuestion}
+  onChange={(e) =>
+    setChatQuestion(e.target.value)
+  }
+  onKeyDown={(e) => {
+
+    if (
+      e.key === "Enter" &&
+      !e.shiftKey
+    ) {
+
+      e.preventDefault();
+
+      askResumeAI();
+    }
+
+  }}
+/>
+
+    <button
+  onClick={askResumeAI}
+  disabled={loading}
+>
+  {loading ? "Thinking..." : "Ask AI"}
+</button>
+
+    <div className="chat-history">
+
+  {chatHistory.map((chat, index) => (
+
+    <div key={index}>
+
+      <div className="user-bubble">
+        {chat.question}
+      </div>
+
+      <div className="ai-message">
+
+  <div className="ai-avatar">
+    🤖
+  </div>
+
+  <div className="ai-bubble">
+    {chat.answer}
+  </div>
+
+</div>
+
+    </div>
+
+  ))}
+
+  {isTyping && (
+
+  <div className="typing-indicator">
+
+    <span></span>
+    <span></span>
+    <span></span>
+
+  </div>
+
+)}
+
+<div ref={chatEndRef}></div>
+
+</div>
+
+  </div>
+
+</div>
           <button onClick={downloadReport}>
             Download Career Report
           </button>

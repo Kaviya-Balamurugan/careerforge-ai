@@ -14,8 +14,22 @@ from backend.app.services.career_summary import generate_career_summary
 from backend.app.services.job_recommender import get_job_recommendations
 from backend.app.services.resume_improver import get_resume_suggestions
 from backend.app.services.ats_analyzer import analyze_ats
-from backend.app.services.interview_generator import generate_questions
+from backend.app.services.ai_interview_generator import generate_questions
+from backend.app.services.interview_evaluator import evaluate_answer
+from backend.app.services.career_chatbot import career_chat
+from backend.app.services.jd_matcher import match_resume_with_jd
+from backend.app.services.answer_evaluator import evaluate_answer
+from backend.app.services.ai_service import ask_ai
+from backend.app.services.resume_chat import chat_with_resume
+
 app = FastAPI()
+
+
+@app.get("/test-ai")
+def test_ai():
+    return {
+        "response": ask_ai("Say Hello")
+    }
 
 app.add_middleware(
     CORSMiddleware,
@@ -135,6 +149,7 @@ def roadmap(filename: str, role: str):
         "roadmap": roadmap
     }
 
+
 @app.get("/learning-plan")
 def learning_plan(filename: str, role: str):
 
@@ -223,6 +238,21 @@ def career_summary(
         "summary": summary
     }
 
+
+@app.post("/evaluate-answer")
+def evaluate_interview_answer(
+    question: str,
+    answer: str
+):
+
+    result = evaluate_answer(
+        question,
+        answer
+    )
+
+    return result
+
+
 @app.get("/job-recommendations")
 def job_recommendations(filename: str):
 
@@ -288,4 +318,72 @@ def interview_questions(role: str):
 
     return {
         "questions": questions
+    }
+
+@app.post("/evaluate-answer")
+def evaluate_interview_answer(
+    question: str,
+    answer: str
+):
+
+    result = evaluate_answer(
+        question,
+        answer
+    )
+
+    return result
+
+@app.get("/career-chat")
+def chat(message: str):
+
+    reply = career_chat(message)
+
+    return {
+        "reply": reply
+    }
+
+@app.post("/jd-match")
+def jd_match(
+    filename: str,
+    job_description: str
+):
+
+    file_path = f"backend/uploads/{filename}"
+
+    resume_text = extract_resume_text(
+        file_path
+    )
+
+    resume_skills = extract_skills(
+        resume_text
+    )
+
+    jd_skills = extract_skills(
+        job_description
+    )
+
+    result = match_resume_with_jd(
+        resume_skills,
+        jd_skills
+    )
+
+    return result
+
+@app.post("/resume-chat")
+def resume_chat(
+    filename: str,
+    question: str
+):
+
+    file_path = f"backend/uploads/{filename}"
+
+    resume_text = extract_resume_text(file_path)
+
+    response = chat_with_resume(
+        resume_text,
+        question
+    )
+
+    return {
+        "answer": response
     }
