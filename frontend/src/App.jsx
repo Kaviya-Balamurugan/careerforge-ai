@@ -28,6 +28,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
+  const [rewrittenResume, setRewrittenResume] = useState("");
 
   useEffect(() => {
 
@@ -306,6 +307,33 @@ const quickPrompt = async (prompt) => {
   setLoading(false);
 };
 
+const rewriteResume = async () => {
+
+  try {
+
+    const response = await axios.post(
+      "http://127.0.0.1:8000/rewrite-resume",
+      null,
+      {
+        params: {
+          filename: uploadedFilename,
+          role,
+        },
+      }
+    );
+
+    setRewrittenResume(
+      response.data.resume
+    );
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+};
+
   const downloadReport = () => {
     if (!result) return;
 
@@ -387,6 +415,7 @@ const quickPrompt = async (prompt) => {
           y += 8;
         }
       );
+      
     }
 
     y += 10;
@@ -670,6 +699,29 @@ if (jdMatch) {
                 </div>
               )
             )}
+            <br />
+
+<button onClick={rewriteResume}>
+  ✨ Rewrite Resume with AI
+</button>
+
+<br />
+<br />
+
+{rewrittenResume && (
+  <div className="roadmap-item">
+    <h3>AI Improved Resume</h3>
+
+    <pre
+      style={{
+        whiteSpace: "pre-wrap",
+        fontFamily: "inherit",
+      }}
+    >
+      {rewrittenResume}
+    </pre>
+  </div>
+)}
 
           <h2>Recommended Jobs</h2>
 

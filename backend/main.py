@@ -4,7 +4,7 @@ import os
 
 from backend.app.services.resume_parser import extract_resume_text
 from backend.app.services.skill_extractor import extract_skills
-from backend.app.services.role_analyzer import get_required_skills
+from backend.app.services.ai_role_analyzer import get_required_skills
 from backend.app.services.gap_analyzer import analyze_skill_gap
 from backend.app.services.roadmap_generator import generate_roadmap
 from backend.app.services.resource_recommender import get_resources
@@ -15,12 +15,13 @@ from backend.app.services.job_recommender import get_job_recommendations
 from backend.app.services.resume_improver import get_resume_suggestions
 from backend.app.services.ats_analyzer import analyze_ats
 from backend.app.services.ai_interview_generator import generate_questions
-from backend.app.services.interview_evaluator import evaluate_answer
 from backend.app.services.career_chatbot import career_chat
 from backend.app.services.jd_matcher import match_resume_with_jd
 from backend.app.services.answer_evaluator import evaluate_answer
 from backend.app.services.ai_service import ask_ai
 from backend.app.services.resume_chat import chat_with_resume
+from backend.app.services.resume_rewriter import rewrite_resume
+from backend.app.services.role_cache import role_skill_cache
 
 app = FastAPI()
 
@@ -91,7 +92,10 @@ def get_skills(filename: str):
 @app.get("/analyze-role")
 def analyze_role(role: str):
 
-    required_skills = get_required_skills(role)
+    if role not in role_skill_cache:
+        role_skill_cache[role] = get_required_skills(role)
+    
+    required_skills = role_skill_cache[role]
 
     return {
         "role": role,
@@ -107,7 +111,10 @@ def skill_gap(filename: str, role: str):
 
     current_skills = extract_skills(resume_text)
 
-    required_skills = get_required_skills(role)
+    if role not in role_skill_cache:
+        role_skill_cache[role] = get_required_skills(role)
+
+    required_skills = role_skill_cache[role]
 
     result = analyze_skill_gap(
         current_skills,
@@ -132,7 +139,10 @@ def roadmap(filename: str, role: str):
 
     current_skills = extract_skills(resume_text)
 
-    required_skills = get_required_skills(role)
+    if role not in role_skill_cache:
+        role_skill_cache[role] = get_required_skills(role)
+        
+    required_skills = role_skill_cache[role]
 
     gap_result = analyze_skill_gap(
         current_skills,
@@ -159,7 +169,10 @@ def learning_plan(filename: str, role: str):
 
     current_skills = extract_skills(resume_text)
 
-    required_skills = get_required_skills(role)
+    if role not in role_skill_cache:
+        role_skill_cache[role] = get_required_skills(role)
+        
+    required_skills = role_skill_cache[role]
 
     gap_result = analyze_skill_gap(
         current_skills,
@@ -193,7 +206,10 @@ def project_recommendations(
 
     current_skills = extract_skills(resume_text)
 
-    required_skills = get_required_skills(role)
+    if role not in role_skill_cache:
+        role_skill_cache[role] = get_required_skills(role)
+        
+    required_skills = role_skill_cache[role]
 
     gap_result = analyze_skill_gap(
         current_skills,
@@ -220,7 +236,10 @@ def career_summary(
 
     current_skills = extract_skills(resume_text)
 
-    required_skills = get_required_skills(role)
+    if role not in role_skill_cache:
+        role_skill_cache[role] = get_required_skills(role)
+
+    required_skills = role_skill_cache[role]
 
     gap_result = analyze_skill_gap(
         current_skills,
@@ -237,20 +256,6 @@ def career_summary(
     return {
         "summary": summary
     }
-
-
-@app.post("/evaluate-answer")
-def evaluate_interview_answer(
-    question: str,
-    answer: str
-):
-
-    result = evaluate_answer(
-        question,
-        answer
-    )
-
-    return result
 
 
 @app.get("/job-recommendations")
@@ -281,10 +286,11 @@ def resume_suggestions(
     current_skills = extract_skills(
         resume_text
     )
+    
+    if role not in role_skill_cache:
+        role_skill_cache[role] = get_required_skills(role)
 
-    required_skills = get_required_skills(
-        role
-    )
+    required_skills = role_skill_cache[role]
 
     gap_result = analyze_skill_gap(
         current_skills,
@@ -386,4 +392,23 @@ def resume_chat(
 
     return {
         "answer": response
+    }
+
+@app.post("/rewrite-resume")
+def rewrite_resume_api(
+    filename: str,
+    role: str
+):
+
+    file_path = f"backend/uploads/{filename}"
+
+    resume_text = extract_resume_text(file_path)
+
+    improved = rewrite_resume(
+        resume_text,
+        role
+    )
+
+    return {
+        "resume": improved
     }
