@@ -22,6 +22,8 @@ from backend.app.services.ai_service import ask_ai
 from backend.app.services.resume_chat import chat_with_resume
 from backend.app.services.resume_rewriter import rewrite_resume
 from backend.app.services.role_cache import role_skill_cache
+from backend.app.services.ai_readiness import evaluate_readiness
+from backend.app.services.resume_score import analyze_resume_score
 
 app = FastAPI()
 
@@ -120,6 +122,10 @@ def skill_gap(filename: str, role: str):
         current_skills,
         required_skills
     )
+    ai_result = evaluate_readiness(
+    resume_text,
+    role
+)
 
     return {
     "role": role,
@@ -127,7 +133,13 @@ def skill_gap(filename: str, role: str):
     "required_skills": required_skills,
     "matched_skills": result["matched_skills"],
     "missing_skills": result["missing_skills"],
-    "readiness_score": result["readiness_score"]
+
+    # AI Score
+    "readiness_score": ai_result["score"],
+
+    "strengths": ai_result["strengths"],
+    "weaknesses": ai_result["weaknesses"],
+    "recommendation": ai_result["recommendation"]
 }
 
 @app.get("/roadmap")
@@ -412,3 +424,20 @@ def rewrite_resume_api(
     return {
         "resume": improved
     }
+
+@app.get("/resume-score")
+def resume_score(
+    filename: str,
+    role: str
+):
+
+    file_path = f"backend/uploads/{filename}"
+
+    resume_text = extract_resume_text(file_path)
+
+    result = analyze_resume_score(
+        resume_text,
+        role
+    )
+
+    return result

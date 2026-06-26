@@ -29,6 +29,7 @@ function App() {
   const [isTyping, setIsTyping] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [rewrittenResume, setRewrittenResume] = useState("");
+  const [resumeScore, setResumeScore] = useState(null);
 
   useEffect(() => {
 
@@ -120,6 +121,18 @@ function App() {
       );
 
       setSummary(summaryResponse.data);
+
+      const scoreResponse = await axios.get(
+  "http://127.0.0.1:8000/resume-score",
+  {
+    params: {
+      filename,
+      role,
+    },
+  }
+);
+
+setResumeScore(scoreResponse.data);
 
       // Resume Suggestions
 const suggestionResponse = await axios.get(
