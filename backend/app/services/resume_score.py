@@ -2,8 +2,8 @@ import json
 from backend.app.services.ai_service import ask_ai
 
 
+print("Loaded resume_score.py")
 def analyze_resume_score(resume_text, role):
-
     prompt = f"""
 You are an expert technical recruiter.
 

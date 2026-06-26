@@ -305,3 +305,55 @@ button:hover {
     opacity: 0.3;
   }
 }
+
+.analytics-grid{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+
+gap:20px;
+
+margin-top:20px;
+
+}
+
+.analytics-item{
+
+padding:18px;
+
+border-radius:14px;
+
+background:white;
+
+box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+text-align:center;
+
+transition:.3s;
+
+}
+
+.analytics-item:hover{
+
+transform:translateY(-5px);
+
+}
+
+.analytics-item h4{
+
+margin-bottom:10px;
+
+}
+
+.analytics-item p{
+
+font-size:22px;
+
+font-weight:bold;
+
+color:#2563eb;
+
+margin-top:10px;
+
+}

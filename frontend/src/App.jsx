@@ -40,169 +40,188 @@ function App() {
 }, [chatHistory]);
 
   const analyzeResume = async () => {
-    if (!file) {
-      alert("Please select a resume");
-      return;
+
+  if (!file) {
+    alert("Please select a resume");
+    return;
+  }
+
+  try {
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // Upload Resume
+    const uploadResponse = await axios.post(
+      "http://127.0.0.1:8000/upload-resume",
+      formData
+    );
+
+    const filename = uploadResponse.data.filename;
+    setUploadedFilename(filename);
+
+    // -----------------------------
+    // Run AI Agent
+    // -----------------------------
+
+    const response = await axios.post(
+      "http://127.0.0.1:8000/agent",
+      null,
+      {
+        params: {
+          filename,
+          role,
+          goal: `Help me become a ${role}`,
+        },
+      }
+    );
+
+    console.log("Agent Response");
+console.log(response.data);
+
+console.log("Results");
+console.log(response.data.results);
+
+    const data = response.data.results;
+
+    // -----------------------------
+    // Skill Gap
+    // -----------------------------
+
+    if (data.skill_gap) {
+      setResult(data.skill_gap);
     }
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
+    // -----------------------------
+    // Resume Score
+    // -----------------------------
 
-      const uploadResponse = await axios.post(
-        "http://127.0.0.1:8000/upload-resume",
-        formData
-      );
-
-      const filename = uploadResponse.data.filename;
-
-      setUploadedFilename(filename);
-      // Skill Gap
-      const gapResponse = await axios.get(
-        "http://127.0.0.1:8000/skill-gap",
-        {
-          params: {
-            filename,
-            role,
-          },
-        }
-      );
-
-      setResult(gapResponse.data);
-
-      // Roadmap
-      const roadmapResponse = await axios.get(
-        "http://127.0.0.1:8000/roadmap",
-        {
-          params: {
-            filename,
-            role,
-          },
-        }
-      );
-
-      setRoadmap(roadmapResponse.data);
-
-      // Learning Plan
-      const learningResponse = await axios.get(
-        "http://127.0.0.1:8000/learning-plan",
-        {
-          params: {
-            filename,
-            role,
-          },
-        }
-      );
-
-      setLearningPlan(learningResponse.data);
-
-      // Projects
-      const projectResponse = await axios.get(
-        "http://127.0.0.1:8000/project-recommendations",
-        {
-          params: {
-            filename,
-            role,
-          },
-        }
-      );
-
-      setProjects(projectResponse.data);
-
-      // Career Summary
-      const summaryResponse = await axios.get(
-        "http://127.0.0.1:8000/career-summary",
-        {
-          params: {
-            filename,
-            role,
-          },
-        }
-      );
-
-      setSummary(summaryResponse.data);
-
-      const scoreResponse = await axios.get(
-  "http://127.0.0.1:8000/resume-score",
-  {
-    params: {
-      filename,
-      role,
-    },
-  }
-);
-
-setResumeScore(scoreResponse.data);
-
-      // Resume Suggestions
-const suggestionResponse = await axios.get(
-  "http://127.0.0.1:8000/resume-suggestions",
-  {
-    params: {
-      filename,
-      role,
-    },
-  }
-);
-
-setSuggestions(suggestionResponse.data);
-
-// Interview Questions
-const interviewResponse = await axios.get(
-  "http://127.0.0.1:8000/interview-questions",
-  {
-    params: {
-      role,
-    },
-  }
-);
-
-setInterviewQuestions(
-  interviewResponse.data.questions
-);
-
-if (
-  interviewResponse.data.questions.length > 0
-) {
-  setSelectedQuestion(
-    interviewResponse.data.questions[0]
-  );
-}
-
-// ATS Score
-const atsResponse = await axios.get(
-  "http://127.0.0.1:8000/ats-score",
-  {
-    params: {
-      filename,
-    },
-  }
-);
-
-setAts(atsResponse.data);
-
-// JD Match
-if (jobDescription.trim() !== "") {
-
-  const jdResponse = await axios.post(
-    "http://127.0.0.1:8000/jd-match",
-    null,
-    {
-      params: {
-        filename,
-        job_description: jobDescription,
-      },
+    if (data.resume_score) {
+      setResumeScore(data.resume_score);
     }
-  );
 
-  setJdMatch(jdResponse.data);
-}
+    // -----------------------------
+    // Roadmap
+    // -----------------------------
 
-    } catch (error) {
-      console.log(error);
-      alert("Error analyzing resume");
+    if (data.roadmap) {
+      setRoadmap({
+        roadmap: data.roadmap,
+      });
     }
-  };
+
+    // -----------------------------
+    // Learning Plan
+    // -----------------------------
+
+    if (data.learning_plan) {
+      setLearningPlan(data.learning_plan);
+    }
+
+    // -----------------------------
+    // ATS
+    // -----------------------------
+
+    if (data.ats) {
+      setAts(data.ats);
+    }
+
+    // -----------------------------
+    // Projects
+    // -----------------------------
+
+    if (data.projects) {
+      setProjects({
+        recommended_projects: data.projects,
+      });
+    }
+
+    // -----------------------------
+    // Career Summary
+    // -----------------------------
+
+    if (data.career_summary) {
+      setSummary({
+        summary: data.career_summary,
+      });
+    }
+
+    // -----------------------------
+    // Resume Suggestions
+    // -----------------------------
+
+    if (data.resume_suggestions) {
+      setSuggestions({
+        suggestions: data.resume_suggestions,
+      });
+    }
+
+    // -----------------------------
+    // Interview Questions
+    // -----------------------------
+
+    if (data.interview_questions) {
+
+      setInterviewQuestions(
+        data.interview_questions
+      );
+
+      if (data.interview_questions.length > 0) {
+        setSelectedQuestion(
+          data.interview_questions[0]
+        );
+      }
+    }
+
+    // -----------------------------
+    // Jobs
+    // -----------------------------
+
+    if (data.jobs) {
+      setJobs({
+        jobs: data.jobs,
+      });
+    }
+
+    // -----------------------------
+    // AI Resume Rewrite
+    // -----------------------------
+
+    if (data.rewritten_resume) {
+      setRewrittenResume(
+        data.rewritten_resume
+      );
+    }
+
+    // -----------------------------
+    // JD Match
+    // -----------------------------
+
+    if (jobDescription.trim() !== "") {
+
+      const jdResponse = await axios.post(
+        "http://127.0.0.1:8000/jd-match",
+        null,
+        {
+          params: {
+            filename,
+            job_description: jobDescription,
+          },
+        }
+      );
+
+      setJdMatch(jdResponse.data);
+    }
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert("Error analyzing resume");
+
+  }
+
+};
 
   const generateInterviewQuestions = async () => {
   try {
@@ -534,6 +553,126 @@ if (jdMatch) {
           <p className="score">
             {result.readiness_score}%
           </p>
+
+          {resumeScore && (
+
+<div className="card">
+
+<h2>📊 AI Resume Analytics</h2>
+
+<div className="analytics-grid">
+
+<div className="analytics-item">
+<h4>Overall Score</h4>
+
+<div className="progress-container">
+<div
+className="progress-bar"
+style={{
+width: `${resumeScore.overall_score}%`
+}}
+></div>
+</div>
+
+<p>{resumeScore.overall_score}%</p>
+
+</div>
+
+<div className="analytics-item">
+<h4>Technical Skills</h4>
+
+<div className="progress-container">
+<div
+className="progress-bar"
+style={{
+width: `${resumeScore.technical_skills}%`
+}}
+></div>
+</div>
+
+<p>{resumeScore.technical_skills}%</p>
+
+</div>
+
+<div className="analytics-item">
+<h4>Projects</h4>
+
+<div className="progress-container">
+<div
+className="progress-bar"
+style={{
+width: `${resumeScore.projects}%`
+}}
+></div>
+</div>
+
+<p>{resumeScore.projects}%</p>
+
+</div>
+
+<div className="analytics-item">
+<h4>Experience</h4>
+
+<div className="progress-container">
+<div
+className="progress-bar"
+style={{
+width: `${resumeScore.experience}%`
+}}
+></div>
+</div>
+
+<p>{resumeScore.experience}%</p>
+
+</div>
+
+<div className="analytics-item">
+<h4>ATS Quality</h4>
+
+<div className="progress-container">
+<div
+className="progress-bar"
+style={{
+width: `${resumeScore.ats}%`
+}}
+></div>
+</div>
+
+<p>{resumeScore.ats}%</p>
+
+</div>
+
+<div className="analytics-item">
+<h4>Resume Quality</h4>
+
+<div className="progress-container">
+<div
+className="progress-bar"
+style={{
+width: `${resumeScore.resume_quality}%`
+}}
+></div>
+</div>
+
+<p>{resumeScore.resume_quality}%</p>
+
+</div>
+
+</div>
+
+<div className="roadmap-item">
+
+<b>🤖 AI Summary</b>
+
+<br /><br />
+
+{resumeScore.summary}
+
+</div>
+
+</div>
+
+)}
 
           <div className="progress-container">
             <div

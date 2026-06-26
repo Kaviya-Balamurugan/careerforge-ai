@@ -1,37 +1,66 @@
-import ast
-from backend.app.services.ai_service import ask_ai
+ROLE_SKILLS = {
+
+    "AI Engineer": [
+        "Python",
+        "TensorFlow",
+        "PyTorch",
+        "Keras",
+        "Scikit-learn",
+        "NumPy",
+        "Pandas",
+        "Matplotlib",
+        "Seaborn",
+        "OpenCV",
+        "NLTK",
+        "SciPy"
+    ],
+
+    "ML Engineer": [
+        "Python",
+        "TensorFlow",
+        "PyTorch",
+        "Scikit-learn",
+        "NumPy",
+        "Pandas",
+        "Machine Learning",
+        "Deep Learning",
+        "Statistics",
+        "SQL",
+        "OpenCV",
+        "Git"
+    ],
+
+    "Data Scientist": [
+        "Python",
+        "Pandas",
+        "NumPy",
+        "Scikit-learn",
+        "SQL",
+        "Statistics",
+        "Machine Learning",
+        "Power BI",
+        "Tableau",
+        "Matplotlib",
+        "Seaborn",
+        "Excel"
+    ],
+
+    "Frontend Developer": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "React",
+        "Redux",
+        "TypeScript",
+        "Git",
+        "REST API",
+        "Bootstrap",
+        "Tailwind CSS",
+        "Next.js",
+        "Responsive Design"
+    ]
+}
 
 
 def get_required_skills(role):
-
-    prompt = f"""
-You are an expert technical recruiter.
-
-Generate the top 12 MOST IMPORTANT technical skills required for this role:
-
-Role: {role}
-
-Rules:
-- Return ONLY a Python list.
-- No explanation.
-- No markdown.
-- No numbering.
-
-Example:
-
-["Python","Java","SQL","Git"]
-"""
-
-    response = ask_ai(
-    prompt,
-    temperature=0
-)
-
-    try:
-        skills = ast.literal_eval(response.strip())
-
-        return skills
-
-    except Exception:
-
-        return []
+    return ROLE_SKILLS.get(role, [])
