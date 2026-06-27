@@ -414,6 +414,14 @@ GROQ_API_KEY=YOUR_GROQ_API_KEY
 
 ---
 
+## 🎥 Demo Video
+
+Watch the complete demo of CareerForge AI here:
+
+**Google Drive:**  
+https://drive.google.com/drive/folders/10-dIY2bGw2NxptNiGuTogk7hIycVCRy4?usp=drive_link
+
+
 # 🚀 Future Enhancements
 
 * Multi-agent collaboration
