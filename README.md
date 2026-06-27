@@ -434,8 +434,3 @@ GROQ_API_KEY=YOUR_GROQ_API_KEY
 
 Developed for the **KartiLine Agentic AI Hackathon 2026**.
 
----
-
-# 📜 License
-
-MIT License
