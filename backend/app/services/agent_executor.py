@@ -47,10 +47,6 @@ def execute_plan(goal, filename, role):
 
     executed_tools = set()
 
-    # -----------------------------
-    # Agent Loop
-    # -----------------------------
-
     while True:
 
         next_tool = decide_next_step(
@@ -71,8 +67,6 @@ def execute_plan(goal, filename, role):
 
         executed_tools.add(next_tool)
 
-        # ---------------- Skill Gap ----------------
-
         if next_tool == "skill_gap":
 
             results["skill_gap"] = gap
@@ -81,8 +75,6 @@ def execute_plan(goal, filename, role):
                 "observation_skill_gap",
                 observe("Skill Gap", gap)
             )
-
-        # ---------------- Resume Score ----------------
 
         elif next_tool == "resume_score":
 
@@ -99,8 +91,6 @@ def execute_plan(goal, filename, role):
                 "observation_resume_score",
                 observe("Resume Score", score)
             )
-
-        # ---------------- Career Summary ----------------
 
         elif next_tool == "career_summary":
 
@@ -120,8 +110,6 @@ def execute_plan(goal, filename, role):
                 observe("Career Summary", summary)
             )
 
-        # ---------------- Resume Suggestions ----------------
-
         elif next_tool == "resume_suggestions":
 
             suggestions = get_resume_suggestions(
@@ -137,8 +125,6 @@ def execute_plan(goal, filename, role):
                 "observation_resume_suggestions",
                 observe("Resume Suggestions", suggestions)
             )
-
-        # ---------------- Resume Rewrite ----------------
 
         elif next_tool == "rewrite_resume":
 
@@ -156,8 +142,6 @@ def execute_plan(goal, filename, role):
                 observe("Resume Rewrite", rewritten)
             )
 
-        # ---------------- ATS ----------------
-
         elif next_tool == "ats":
 
             ats = analyze_ats(resume_text)
@@ -170,8 +154,6 @@ def execute_plan(goal, filename, role):
                 "observation_ats",
                 observe("ATS Analysis", ats)
             )
-
-        # ---------------- Roadmap ----------------
 
         elif next_tool == "roadmap":
 
@@ -188,8 +170,6 @@ def execute_plan(goal, filename, role):
                 observe("Roadmap", roadmap)
             )
 
-        # ---------------- Projects ----------------
-
         elif next_tool == "projects":
 
             projects = get_projects(
@@ -205,13 +185,12 @@ def execute_plan(goal, filename, role):
                 observe("Projects", projects)
             )
 
-        # ---------------- Jobs ----------------
-
         elif next_tool == "job_recommendations":
 
             jobs = get_job_recommendations(
-                current_skills
-            )
+    current_skills,
+    role
+)
 
             results["jobs"] = jobs
 
@@ -221,8 +200,6 @@ def execute_plan(goal, filename, role):
                 "observation_jobs",
                 observe("Job Recommendations", jobs)
             )
-
-        # ---------------- Interview ----------------
 
         elif next_tool == "interview_questions":
 
@@ -264,10 +241,6 @@ def execute_plan(goal, filename, role):
             print("Unknown tool:", next_tool)
             break
 
-        # ===================================================
-        # REFLECTION STEP (NEW)
-        # ===================================================
-
         reflection = reflect(
             goal,
             memory.all()
@@ -280,10 +253,6 @@ def execute_plan(goal, filename, role):
             f"reflection_{len(executed_tools)}",
             reflection
         )
-
-    # -----------------------------
-    # Return Results
-    # -----------------------------
 
     results["memory"] = memory.all()
 

@@ -275,7 +275,10 @@ def career_summary(
 
 
 @app.get("/job-recommendations")
-def job_recommendations(filename: str):
+def job_recommendations(
+    filename: str,
+    role: str
+):
 
     file_path = f"backend/uploads/{filename}"
 
@@ -283,7 +286,10 @@ def job_recommendations(filename: str):
 
     current_skills = extract_skills(resume_text)
 
-    jobs = get_job_recommendations(current_skills)
+    jobs = get_job_recommendations(
+        current_skills,
+        role
+    )
 
     return {
         "jobs": jobs

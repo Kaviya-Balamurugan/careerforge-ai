@@ -1,29 +1,51 @@
-def get_job_recommendations(skills):
+from backend.app.services.ai_service import ask_ai
+import json
 
-    jobs = []
 
-    if "Python" in skills:
-        jobs.append({
-            "role": "AI Engineer",
-            "match": 85
-        })
+def get_job_recommendations(skills, target_role):
 
-    if "Machine Learning" in skills:
-        jobs.append({
-            "role": "ML Engineer",
-            "match": 80
-        })
+    prompt = f"""
+    You are an AI Career Advisor.
 
-    if "SQL" in skills:
-        jobs.append({
-            "role": "Data Scientist",
-            "match": 75
-        })
+    User Target Role:
+    {target_role}
 
-    if "React" in skills:
-        jobs.append({
-            "role": "Frontend Developer",
-            "match": 90
-        })
+    Resume Skills:
+    {", ".join(skills)}
 
-    return jobs
+    Recommend exactly 5 job roles closely related to the target role.
+
+    For each role,
+    estimate a realistic match percentage based on the resume skills.
+
+    Return ONLY valid JSON.
+
+    Example:
+
+    {{
+        "jobs":[
+            {{
+                "role":"Machine Learning Engineer",
+                "match":92
+            }},
+            {{
+                "role":"AI Engineer",
+                "match":88
+            }}
+        ]
+    }}
+    """
+
+    response = ask_ai(prompt, temperature=0.3)
+
+    try:
+        return json.loads(response)["jobs"]
+
+    except Exception:
+
+        return [
+            {
+                "role": target_role,
+                "match": 80
+            }
+        ]

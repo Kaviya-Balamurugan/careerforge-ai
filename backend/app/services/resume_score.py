@@ -1,49 +1,22 @@
-import json
-from backend.app.services.ai_service import ask_ai
+from backend.app.services.skill_extractor import extract_skills
 
-
-print("Loaded resume_score.py")
 def analyze_resume_score(resume_text, role):
-    prompt = f"""
-You are an expert technical recruiter.
 
-Analyze this resume for the role:
+    skills = extract_skills(resume_text)
 
-{role}
+    technical = min(len(skills) * 8, 100)
 
-Resume:
+    projects = 90 if "project" in resume_text.lower() else 50
+    experience = 80 if "intern" in resume_text.lower() else 50
+    ats = 90
+    quality = int((technical + projects + experience + ats) / 4)
 
-{resume_text}
-
-Return ONLY valid JSON.
-
-Example:
-
-{{
-  "overall_score":85,
-  "technical_skills":90,
-  "projects":80,
-  "experience":70,
-  "ats":88,
-  "resume_quality":82,
-  "summary":"Strong ML profile with good projects but limited industry experience."
-}}
-"""
-
-    response = ask_ai(prompt)
-
-    try:
-        response = response.replace("```json", "")
-        response = response.replace("```", "").strip()
-        
-        return json.loads(response)
-    except:
-        return {
-            "overall_score":70,
-            "technical_skills":70,
-            "projects":70,
-            "experience":70,
-            "ats":70,
-            "resume_quality":70,
-            "summary":"Unable to evaluate."
-        }
+    return {
+        "overall_score": quality,
+        "technical_skills": technical,
+        "projects": projects,
+        "experience": experience,
+        "ats": ats,
+        "resume_quality": quality,
+        "summary": "Automatically generated using CareerForge AI."
+    }

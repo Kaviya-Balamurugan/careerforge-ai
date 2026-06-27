@@ -2,11 +2,21 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { jsPDF } from "jspdf";
+import Sidebar from "./components/Sidebar";
+import Dashboard from "./components/Dashboard";
+import Analytics from "./components/Analytics";
+import Skills from "./components/Skills";
+import Projects from "./components/Projects";
+import ATS from "./components/ATS";
+import Assistant from "./components/Assistant";
+import Interview from "./components/Interview";
+
 
 function App() {
   const [file, setFile] = useState(null);
   const [role, setRole] = useState("AI Engineer");
   const chatEndRef = useRef(null);
+
 
   const [result, setResult] = useState(null);
   const [roadmap, setRoadmap] = useState(null);
@@ -23,13 +33,13 @@ function App() {
   const [jobDescription, setJobDescription] = useState("");
   const [jdMatch, setJdMatch] = useState(null);
   const [chatQuestion, setChatQuestion] = useState("");
-  const [chatResponse, setChatResponse] = useState("");
   const [uploadedFilename, setUploadedFilename] = useState("");
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [rewrittenResume, setRewrittenResume] = useState("");
   const [resumeScore, setResumeScore] = useState(null);
+  const [activePage, setActivePage] = useState("dashboard");
 
   useEffect(() => {
 
@@ -60,10 +70,6 @@ function App() {
     const filename = uploadResponse.data.filename;
     setUploadedFilename(filename);
 
-    // -----------------------------
-    // Run AI Agent
-    // -----------------------------
-
     const response = await axios.post(
       "http://127.0.0.1:8000/agent",
       null,
@@ -84,25 +90,13 @@ console.log(response.data.results);
 
     const data = response.data.results;
 
-    // -----------------------------
-    // Skill Gap
-    // -----------------------------
-
     if (data.skill_gap) {
       setResult(data.skill_gap);
     }
 
-    // -----------------------------
-    // Resume Score
-    // -----------------------------
-
     if (data.resume_score) {
       setResumeScore(data.resume_score);
     }
-
-    // -----------------------------
-    // Roadmap
-    // -----------------------------
 
     if (data.roadmap) {
       setRoadmap({
@@ -110,25 +104,13 @@ console.log(response.data.results);
       });
     }
 
-    // -----------------------------
-    // Learning Plan
-    // -----------------------------
-
     if (data.learning_plan) {
       setLearningPlan(data.learning_plan);
     }
 
-    // -----------------------------
-    // ATS
-    // -----------------------------
-
     if (data.ats) {
       setAts(data.ats);
     }
-
-    // -----------------------------
-    // Projects
-    // -----------------------------
 
     if (data.projects) {
       setProjects({
@@ -136,29 +118,17 @@ console.log(response.data.results);
       });
     }
 
-    // -----------------------------
-    // Career Summary
-    // -----------------------------
-
     if (data.career_summary) {
       setSummary({
         summary: data.career_summary,
       });
     }
 
-    // -----------------------------
-    // Resume Suggestions
-    // -----------------------------
-
     if (data.resume_suggestions) {
       setSuggestions({
         suggestions: data.resume_suggestions,
       });
     }
-
-    // -----------------------------
-    // Interview Questions
-    // -----------------------------
 
     if (data.interview_questions) {
 
@@ -173,29 +143,17 @@ console.log(response.data.results);
       }
     }
 
-    // -----------------------------
-    // Jobs
-    // -----------------------------
-
     if (data.jobs) {
       setJobs({
         jobs: data.jobs,
       });
     }
 
-    // -----------------------------
-    // AI Resume Rewrite
-    // -----------------------------
-
     if (data.rewritten_resume) {
       setRewrittenResume(
         data.rewritten_resume
       );
     }
-
-    // -----------------------------
-    // JD Match
-    // -----------------------------
 
     if (jobDescription.trim() !== "") {
 
@@ -268,8 +226,12 @@ const evaluateAnswer = async () => {
 };
 
 const askResumeAI = async () => {
+
+  if (!chatQuestion.trim()) return;
+
   setLoading(true);
   setIsTyping(true);
+
   try {
 
     const response = await axios.post(
@@ -285,26 +247,38 @@ const askResumeAI = async () => {
 
     const aiAnswer = response.data.answer;
 
-setChatResponse(aiAnswer);
+    setChatHistory((prev) => [
+      ...prev,
+      {
+        question: chatQuestion,
+        answer: aiAnswer,
+      },
+    ]);
 
-setChatHistory((prev) => [
-  ...prev,
-  {
-    question: chatQuestion,
-    answer: aiAnswer,
-  },
-]);
-
-setChatQuestion("");
-setLoading(false);
-setIsTyping(false);
+    setChatQuestion("");
 
   } catch (error) {
-    console.log(error);
-    alert("AI Assistant Error");
-  }
-};
 
+    console.error(error);
+
+    setChatHistory((prev) => [
+      ...prev,
+      {
+        question: chatQuestion,
+        answer:
+          "⚠️ AI service is temporarily unavailable. Please try again in a few minutes.",
+      },
+    ]);
+
+  } finally {
+
+    // This ALWAYS executes
+    setLoading(false);
+    setIsTyping(false);
+
+  }
+
+};
 const quickPrompt = async (prompt) => {
 
   setLoading(true);
@@ -512,599 +486,111 @@ if (jdMatch) {
   };
 
   return (
-    <div className="container">
-      <h1 className="title">CareerForge AI</h1>
-
-      <div className="card upload-section">
-        <input
-          type="file"
-          onChange={(e) =>
-            setFile(e.target.files[0])
-          }
-        />
-
-        <input
-          type="text"
-          placeholder="Enter Target Role"
-          value={role}
-          onChange={(e) =>
-            setRole(e.target.value)
-          }
-        />
-
-        <textarea
-  rows="6"
-  placeholder="Paste Job Description Here"
-  value={jobDescription}
-  onChange={(e) =>
-    setJobDescription(e.target.value)
-  }
-/>
-
-        <button onClick={analyzeResume}>
-          Analyze Resume
-        </button>
-      </div>
-
-      {result && (
-        <div className="card">
-          <h2>Readiness Score</h2>
-
-          <p className="score">
-            {result.readiness_score}%
-          </p>
-
-          {resumeScore && (
-
-<div className="card">
-
-<h2>📊 AI Resume Analytics</h2>
-
-<div className="analytics-grid">
-
-<div className="analytics-item">
-<h4>Overall Score</h4>
-
-<div className="progress-container">
-<div
-className="progress-bar"
-style={{
-width: `${resumeScore.overall_score}%`
-}}
-></div>
-</div>
-
-<p>{resumeScore.overall_score}%</p>
-
-</div>
-
-<div className="analytics-item">
-<h4>Technical Skills</h4>
-
-<div className="progress-container">
-<div
-className="progress-bar"
-style={{
-width: `${resumeScore.technical_skills}%`
-}}
-></div>
-</div>
-
-<p>{resumeScore.technical_skills}%</p>
-
-</div>
-
-<div className="analytics-item">
-<h4>Projects</h4>
-
-<div className="progress-container">
-<div
-className="progress-bar"
-style={{
-width: `${resumeScore.projects}%`
-}}
-></div>
-</div>
-
-<p>{resumeScore.projects}%</p>
-
-</div>
-
-<div className="analytics-item">
-<h4>Experience</h4>
-
-<div className="progress-container">
-<div
-className="progress-bar"
-style={{
-width: `${resumeScore.experience}%`
-}}
-></div>
-</div>
-
-<p>{resumeScore.experience}%</p>
-
-</div>
-
-<div className="analytics-item">
-<h4>ATS Quality</h4>
-
-<div className="progress-container">
-<div
-className="progress-bar"
-style={{
-width: `${resumeScore.ats}%`
-}}
-></div>
-</div>
-
-<p>{resumeScore.ats}%</p>
-
-</div>
-
-<div className="analytics-item">
-<h4>Resume Quality</h4>
-
-<div className="progress-container">
-<div
-className="progress-bar"
-style={{
-width: `${resumeScore.resume_quality}%`
-}}
-></div>
-</div>
-
-<p>{resumeScore.resume_quality}%</p>
-
-</div>
-
-</div>
-
-<div className="roadmap-item">
-
-<b>🤖 AI Summary</b>
-
-<br /><br />
-
-{resumeScore.summary}
-
-</div>
-
-</div>
-
-)}
-
-          <div className="progress-container">
-            <div
-              className="progress-bar"
-              style={{
-                width: `${result.readiness_score}%`,
-              }}
-            ></div>
-          </div>
-
-          <h2>Missing Skills</h2>
-
-          <ul className="skills-list">
-            {result.missing_skills.map(
-              (skill, index) => (
-                <li key={index}>{skill}</li>
-              )
-            )}
-          </ul>
-
-          <h2>Learning Roadmap</h2>
-
-          {roadmap &&
-            Object.entries(roadmap.roadmap).map(
-              ([week, skill]) => (
-                <div
-                  key={week}
-                  className="roadmap-item"
-                >
-                  <b>{week}</b> → {skill}
-                </div>
-              )
-            )}
-
-          <h2>Learning Resources</h2>
-
-          {learningPlan &&
-            Object.entries(learningPlan).map(
-              ([week, details]) => (
-                <div
-                  key={week}
-                  className="roadmap-item"
-                >
-                  <h4>
-                    {week} - {details.skill}
-                  </h4>
-
-                  <ul className="skills-list">
-                    {details.resources.map(
-                      (resource, index) => (
-                        <li key={index}>
-                          {resource}
-                        </li>
-                      )
-                    )}
-                  </ul>
-                </div>
-              )
-            )}
-
-          <h2>Recommended Projects</h2>
-
-          {projects &&
-            projects.recommended_projects.map(
-              (project, index) => (
-                <div
-                  key={index}
-                  className="roadmap-item"
-                >
-                  {project}
-                </div>
-              )
-            )}
-
-            <h2>ATS Score</h2>
-
-{ats && (
-  <>
-    <p className="score">
-      {ats.ats_score}%
-    </p>
-
-    <div className="progress-container">
-      <div
-        className="progress-bar"
-        style={{
-          width: `${ats.ats_score}%`,
-        }}
-      ></div>
-    </div>
-
-    <h3>ATS Suggestions</h3>
-
-    {ats.suggestions.length === 0 ? (
-      <div className="roadmap-item">
-        Excellent Resume! ATS Friendly.
-      </div>
-    ) : (
-      ats.suggestions.map(
-        (suggestion, index) => (
-          <div
-            key={index}
-            className="roadmap-item"
-          >
-            {suggestion}
-          </div>
-        )
-      )
-    )}
-  </>
-)}
-
-<h2>Resume vs Job Description Match</h2>
-
-{jdMatch && (
-  <>
-    <p className="score">
-      {jdMatch.match_score}%
-    </p>
-
-    <div className="progress-container">
-      <div
-        className="progress-bar"
-        style={{
-          width: `${jdMatch.match_score}%`,
-        }}
-      ></div>
-    </div>
-
-    <h3>Matched Skills</h3>
-
-    {jdMatch.matched_skills.map(
-      (skill, index) => (
-        <div
-          key={index}
-          className="roadmap-item"
-        >
-          ✅ {skill}
-        </div>
-      )
-    )}
-
-    <h3>Missing Skills</h3>
-
-    {jdMatch.missing_skills.map(
-      (skill, index) => (
-        <div
-          key={index}
-          className="roadmap-item"
-        >
-          ❌ {skill}
-        </div>
-      )
-    )}
-  </>
-)}
-
-          <h2>Career Summary</h2>
-
-          {summary && (
-            <div className="roadmap-item">
-              {summary.summary}
-            </div>
-          )}
-
-          <h2>Resume Improvement Suggestions</h2>
-
-          {suggestions &&
-            suggestions.suggestions.map(
-              (suggestion, index) => (
-                <div
-                  key={index}
-                  className="roadmap-item"
-                >
-                  {suggestion}
-                </div>
-              )
-            )}
-            <br />
-
-<button onClick={rewriteResume}>
-  ✨ Rewrite Resume with AI
-</button>
-
-<br />
-<br />
-
-{rewrittenResume && (
-  <div className="roadmap-item">
-    <h3>AI Improved Resume</h3>
-
-    <pre
-      style={{
-        whiteSpace: "pre-wrap",
-        fontFamily: "inherit",
-      }}
-    >
-      {rewrittenResume}
-    </pre>
-  </div>
-)}
-
-          <h2>Recommended Jobs</h2>
-
-          {jobs &&
-            jobs.jobs.map((job, index) => (
-              <div
-                key={index}
-                className="roadmap-item"
-              >
-                <b>{job.role}</b> - Match Score:{" "}
-                {job.match}
-              </div>
-            ))}
-
-          <br />
-
-          <h2>Interview Questions</h2>
-
-{interviewQuestions &&
-  interviewQuestions.map(
-    (question, index) => (
-      <div
-        key={index}
-        className="roadmap-item"
-      >
-        <b>Q{index + 1}.</b> {question}
-      </div>
-    )
-  )
-}
-
-<h2>Mock Interview</h2>
-
-<button
-  onClick={generateInterviewQuestions}
->
-  Generate Questions
-</button>
-
-<br />
-<br />
-
-{selectedQuestion && (
-  <div className="roadmap-item">
-
-    <h3>Question</h3>
-
-    <p>{selectedQuestion}</p>
-
-    <textarea
-      rows="5"
-      cols="60"
-      placeholder="Enter your answer"
-      value={answer}
-      onChange={(e) =>
-        setAnswer(e.target.value)
-      }
+  <div className="app-layout">
+
+    <Sidebar
+      activePage={activePage}
+      setActivePage={setActivePage}
     />
 
-    <br />
-    <br />
+    <main className="main-content">
 
-    <button
-      onClick={evaluateAnswer}
-    >
-      Submit Answer
-    </button>
+      <div className="container">
 
-  </div>
-)}
+        {activePage === "dashboard" && (
+          <Dashboard
+            file={file}
+            setFile={setFile}
+            role={role}
+            setRole={setRole}
+            jobDescription={jobDescription}
+            setJobDescription={setJobDescription}
+            analyzeResume={analyzeResume}
+            result={result}
+            resumeScore={resumeScore}
+            ats={ats}
+            jobs={jobs}
+          />
+        )}
 
-{evaluation && (
-  <div className="roadmap-item">
+        {result && (
+          <div className="card">
+            <h2>Readiness Score</h2>
 
-    <h3>
-      Score: {evaluation.score}/10
-    </h3>
+            <p className="score">
+              {result.readiness_score}%
+            </p>
 
-    {evaluation.feedback.map(
-      (item, index) => (
-        <div key={index}>
-          • {item}
-        </div>
-      )
-    )}
+            <div className="progress-container">
+              <div
+                className="progress-bar"
+                style={{
+                  width: `${result.readiness_score}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
 
-  </div>
-)}
+        {activePage === "analytics" && (
+          <Analytics resumeScore={resumeScore} />
+        )}
 
-<div className="chat-container">
+        {activePage === "skills" && (
+          <Skills
+            result={result}
+            roadmap={roadmap}
+            learningPlan={learningPlan}
+          />
+        )}
 
-  <div className="chat-box">
-    <div className="quick-actions">
+        {activePage === "projects" && (
+          <Projects projects={projects} />
+        )}
 
-  <button
-    onClick={() =>
-      quickPrompt(
-        "How can I improve my resume?"
-      )
-    }
-  >
-    🚀 Improve Resume
-  </button>
+        {activePage === "ats" && (
+          <ATS
+            ats={ats}
+            jdMatch={jdMatch}
+            summary={summary}
+            suggestions={suggestions}
+            rewrittenResume={rewrittenResume}
+            rewriteResume={rewriteResume}
+            jobs={jobs}
+            interviewQuestions={interviewQuestions}
+          />
+        )}
 
-  <button
-    onClick={() =>
-      quickPrompt(
-        "Generate a professional cover letter based on my profile."
-      )
-    }
-  >
-    💼 Cover Letter
-  </button>
+        {activePage === "assistant" && (
+          <Assistant
+            chatQuestion={chatQuestion}
+            setChatQuestion={setChatQuestion}
+            askResumeAI={askResumeAI}
+            quickPrompt={quickPrompt}
+            loading={loading}
+            chatHistory={chatHistory}
+            isTyping={isTyping}
+            chatEndRef={chatEndRef}
+            downloadReport={downloadReport}
+          />
+        )}
 
-  <button
-    onClick={() =>
-      quickPrompt(
-        "Generate a strong LinkedIn headline for me."
-      )
-    }
-  >
-    🔗 LinkedIn Headline
-  </button>
+        {activePage === "interview" && (
+          <Interview
+            generateInterviewQuestions={generateInterviewQuestions}
+            selectedQuestion={selectedQuestion}
+            answer={answer}
+            setAnswer={setAnswer}
+            evaluateAnswer={evaluateAnswer}
+            evaluation={evaluation}
+          />
+        )}
 
-  <button
-    onClick={() =>
-      quickPrompt(
-        "Rewrite my project descriptions professionally."
-      )
-    }
-  >
-    📄 Rewrite Projects
-  </button>
-
-  <button
-    onClick={() =>
-      quickPrompt(
-        "Give me career advice based on my resume."
-      )
-    }
-  >
-    🎯 Career Advice
-  </button>
-
-</div>
-
-    <div className="chat-title">
-      🤖 CareerForge AI Assistant
-    </div>
-
-    <textarea
-  className="chat-input"
-  placeholder="Ask anything about your resume..."
-  value={chatQuestion}
-  onChange={(e) =>
-    setChatQuestion(e.target.value)
-  }
-  onKeyDown={(e) => {
-
-    if (
-      e.key === "Enter" &&
-      !e.shiftKey
-    ) {
-
-      e.preventDefault();
-
-      askResumeAI();
-    }
-
-  }}
-/>
-
-    <button
-  onClick={askResumeAI}
-  disabled={loading}
->
-  {loading ? "Thinking..." : "Ask AI"}
-</button>
-
-    <div className="chat-history">
-
-  {chatHistory.map((chat, index) => (
-
-    <div key={index}>
-
-      <div className="user-bubble">
-        {chat.question}
       </div>
 
-      <div className="ai-message">
-
-  <div className="ai-avatar">
-    🤖
-  </div>
-
-  <div className="ai-bubble">
-    {chat.answer}
-  </div>
-
-</div>
-
-    </div>
-
-  ))}
-
-  {isTyping && (
-
-  <div className="typing-indicator">
-
-    <span></span>
-    <span></span>
-    <span></span>
+    </main>
 
   </div>
-
-)}
-
-<div ref={chatEndRef}></div>
-
-</div>
-
-  </div>
-
-</div>
-          <button onClick={downloadReport}>
-            Download Career Report
-          </button>
-        </div>
-      )}
-    </div>
-  );
+);
 }
-
 export default App;
