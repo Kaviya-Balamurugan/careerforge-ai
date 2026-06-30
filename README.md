@@ -1,317 +1,94 @@
-# 🚀 CareerForge AI
+# 🚀 CareerForge AI – Agentic AI Career Assistant
 
-### AI-Powered Agentic Career Assistant
+> An AI-powered career assistant that analyzes resumes, identifies skill gaps, evaluates ATS readiness, generates personalized learning roadmaps, recommends jobs, prepares users for interviews, and provides AI-powered career guidance using an Agentic AI workflow.
 
-> **CareerForge AI** is an Agentic AI platform that helps students and job seekers improve their resumes, identify skill gaps, prepare for interviews, optimize ATS scores, and build personalized career roadmaps.
+🌐 **Live Demo:** https://careerforge-ai-kaviya.vercel.app
 
-Built for the **KartiLine Agentic AI Hackathon 2026**.
-
----
-
-# 📌 Problem Statement
-
-Students often struggle to understand why their resumes are rejected, what skills they are missing, which projects to build, and how to prepare for interviews.
-
-Current career platforms provide fragmented solutions:
-
-* Resume analyzers
-* ATS checkers
-* Learning platforms
-* Interview preparation tools
-
-Users must switch between multiple platforms.
-
-CareerForge AI unifies all these tasks into one intelligent AI agent.
-
----
-
-# 🎯 Objective
-
-Build an Agentic AI Career Assistant that can:
-
-* Analyze resumes
-* Detect missing skills
-* Recommend personalized learning paths
-* Suggest projects
-* Improve ATS compatibility
-* Generate interview questions
-* Rewrite resumes
-* Recommend jobs
-* Provide AI-powered career guidance
-
----
-
-# 🧠 Agentic AI Workflow
-
-CareerForge AI follows the complete Agentic AI loop.
-
-## 👀 Perceive
-
-The agent collects information by:
-
-* Reading uploaded resume
-* Extracting skills
-* Understanding the target role
-* Parsing optional job descriptions
-
----
-
-## 🤔 Decide
-
-The planner decides which tools should execute.
-
-Examples:
-
-* Skill Gap Analysis
-* Resume Scoring
-* ATS Analysis
-* Career Summary
-* Resume Suggestions
-* Learning Roadmap
-* Project Recommendations
-* Job Recommendations
-* Resume Rewrite
-* Interview Question Generation
-
----
-
-## ⚡ Act
-
-The agent executes AI services to:
-
-* Analyze resume
-* Generate ATS feedback
-* Recommend jobs
-* Rewrite resume
-* Chat with user
-* Evaluate interview answers
-
----
-
-## 👁 Observe
-
-The system stores observations in memory after each action.
-
-Examples:
-
-* Resume analysis
-* Skill gaps
-* ATS results
-* Generated roadmap
-* Interview questions
-* AI reflections
-
----
-
-## 🔁 Reflect
-
-After every action the agent reflects whether the goal has been completed.
-
-Example:
-
-```
-Goal:
-Become an ML Engineer
-
-↓
-
-Skill Gap
-
-↓
-
-Roadmap
-
-↓
-
-Resume Score
-
-↓
-
-Projects
-
-↓
-
-ATS
-
-↓
-
-Interview Preparation
-
-↓
-
-Goal Completed
-```
+📂 **GitHub Repository:** https://github.com/Kaviya-Balamurugan/careerforge-ai
 
 ---
 
 # ✨ Features
 
-## 📄 Resume Analysis
-
-* Resume parsing
-* Resume quality score
-* Technical skill extraction
-
----
-
-## 🎯 Skill Gap Detection
-
-Compares resume skills against target role.
-
-Outputs:
-
-* Missing Skills
-* Matching Skills
-* Readiness Score
+- 📄 Resume Upload & Parsing
+- 📊 ATS Resume Analysis
+- 🎯 Skill Gap Analysis
+- 📈 Resume Readiness Score
+- 🛣 Personalized Learning Roadmap
+- 📚 Learning Resource Recommendations
+- 💼 AI Job Recommendations
+- 🤖 AI Career Summary
+- 💬 AI Resume Chat Assistant
+- 🎤 AI Interview Question Generator
+- ✅ AI Interview Answer Evaluation
+- ✍️ AI Resume Rewriter
+- 📑 Resume vs Job Description Matching
+- 📥 PDF Report Generation
 
 ---
 
-## 🛣 Personalized Learning Roadmap
+# 🧠 Agentic AI Workflow
 
-Generates weekly roadmap.
+CareerForge AI follows an **Agentic AI architecture** where the system autonomously plans, reasons, executes tools, observes results, and reflects before deciding the next action.
 
-Example:
+```
+Perceive
+    ↓
+Plan
+    ↓
+Decide
+    ↓
+Execute Tools
+    ↓
+Observe
+    ↓
+Reflect
+    ↓
+Goal Achieved
+```
 
-Week 1 → PyTorch
-
-Week 2 → NumPy
-
-Week 3 → OpenCV
-
----
-
-## 📚 Learning Resources
-
-Provides official resources for every missing skill.
-
----
-
-## 🚀 Project Recommendations
-
-Suggests projects based on missing skills.
-
-Example:
-
-* Brain Tumor Classification
-* Object Detection System
-* AI Resume Analyzer
-* CareerForge AI
-
----
-
-## 📈 Resume Analytics
-
-Shows
-
-* Resume Score
-* Technical Skills Score
-* Project Score
-* Experience Score
-* ATS Score
-
----
-
-## 📄 ATS Resume Analyzer
-
-Analyzes resume for ATS compatibility.
-
-Provides
-
-* ATS Score
-* ATS Suggestions
-
----
-
-## 🤖 AI Career Summary
-
-Generates personalized career summary based on
-
-* Resume
-* Skills
-* Target Role
-
----
-
-## 💼 AI Job Recommendation
-
-Suggests relevant job roles based on resume skills.
-
----
-
-## 🎤 AI Interview Preparation
-
-Generates role-specific interview questions.
-
-Examples
-
-* ML Engineer
-* AI Engineer
-* Data Scientist
-* Frontend Developer
-
----
-
-## ⭐ AI Interview Evaluation
-
-Evaluates user answers.
-
-Returns
-
-* Score
-* Feedback
-* Improvement Suggestions
-
----
-
-## 💬 AI Career Assistant
-
-Allows users to ask questions like
-
-* Improve my resume
-* What skills am I missing?
-* How can I become an AI Engineer?
-* Suggest projects
-* Prepare me for interviews
-
----
-
-## ✍ AI Resume Rewrite
-
-Generates an improved ATS-friendly resume.
-
----
-
-## 📥 Career Report
-
-Exports a downloadable report containing
-
-* Skill Gap
-* ATS Report
-* Projects
-* Roadmap
-* Interview Questions
+The agent dynamically selects the required tools instead of executing every module sequentially.
 
 ---
 
 # 🏗 System Architecture
 
 ```
-React Frontend
+Frontend (React.js)
+
         │
+
         ▼
-FastAPI Backend
+
+ FastAPI Backend
+
         │
+
         ▼
+
 Agent Planner
-        │
-        ▼
+Agent Memory
+Agent Decider
 Agent Executor
+Agent Observer
+Agent Reflector
+
         │
+
         ▼
-Perceive → Decide → Act → Observe → Reflect
-        │
-        ▼
-Groq Llama 3.3 70B
+
+AI Modules
+
+• Resume Parser
+• ATS Analyzer
+• Skill Gap Analyzer
+• Resume Score
+• Career Summary
+• Learning Roadmap
+• Job Recommendation
+• Resume Chat
+• Resume Rewriter
+• Interview Generator
 ```
 
 ---
@@ -320,58 +97,84 @@ Groq Llama 3.3 70B
 
 ## Frontend
 
-* React
-* Vite
-* CSS
-* Axios
+- React.js
+- Axios
+- CSS
+- jsPDF
 
 ## Backend
 
-* Python
-* FastAPI
-* Uvicorn
+- FastAPI
+- Python
+- Groq API (Llama 3.3)
+- PyMuPDF
 
-## AI
+## AI Features
 
-* Groq API
-* Llama 3.3 70B
-
-## Resume Processing
-
-* PyPDF2
-* PDF Parsing
-* Skill Extraction
-
----
-
-# 📂 Project Structure
-
-```
-careerforge-ai/
-
-backend/
-    app/
-        services/
-    uploads/
-    main.py
-
-frontend/
-    src/
-        components/
-    App.jsx
-
-README.md
-requirements.txt
-```
+- LLM-powered Resume Analysis
+- ATS Evaluation
+- Resume Chat
+- Interview Generation
+- Resume Rewriting
+- Agentic AI Workflow
 
 ---
 
-# ⚙ Installation
+# 📸 Application Modules
+
+### 📄 Dashboard
+
+- Upload Resume
+- Select Target Role
+- Resume Analysis
+- Job Description Matching
+
+### 📊 Analytics
+
+- Resume Score
+- Readiness Score
+- ATS Score
+
+### 🎯 Skills
+
+- Skill Gap Analysis
+- Personalized Learning Roadmap
+- Learning Resources
+
+### 💼 Projects
+
+- AI Recommended Projects
+
+### 📑 ATS
+
+- ATS Report
+- Career Summary
+- Resume Suggestions
+- Resume Rewrite
+- Job Recommendations
+
+### 🤖 AI Assistant
+
+- Resume-based Chat
+- Career Guidance
+- Download PDF Report
+
+### 🎤 Interview
+
+- AI Interview Questions
+- AI Answer Evaluation
+- Feedback & Suggestions
+
+---
+
+# 🚀 Installation
 
 ## Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/careerforge-ai.git
+git clone https://github.com/Kaviya-Balamurugan/careerforge-ai.git
+
+cd careerforge-ai
 ```
 
 ---
@@ -387,7 +190,7 @@ venv\Scripts\activate
 
 pip install -r requirements.txt
 
-uvicorn backend.main:app --reload
+uvicorn main:app --reload
 ```
 
 ---
@@ -406,39 +209,58 @@ npm run dev
 
 # 🔑 Environment Variables
 
-Create a `.env` file
+Create a `.env` file inside the backend directory.
 
 ```env
-GROQ_API_KEY=YOUR_GROQ_API_KEY
+GROQ_API_KEY=your_groq_api_key
 ```
 
 ---
 
-## 🎥 Demo Video
+# 📂 Project Structure
 
-Watch the complete demo of CareerForge AI here:
+```
+careerforge-ai/
 
-**Google Drive:**  
-https://drive.google.com/drive/folders/10-dIY2bGw2NxptNiGuTogk7hIycVCRy4?usp=drive_link
-
-
-# 🚀 Future Enhancements
-
-* Multi-agent collaboration
-* Resume ranking
-* Company-specific interview preparation
-* LinkedIn profile optimization
-* Cover letter generation
-* Internship recommendation engine
-* Live job search integration
-* Email automation
-* Memory-enhanced AI coaching
+├── backend/
+│   ├── app/
+│   │   ├── services/
+│   │   └── uploads/
+│   ├── main.py
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+└── README.md
+```
 
 ---
 
-# 👩‍💻 Team
+# 📈 Future Improvements
 
-**The Innovators**
+- User Authentication
+- Resume History
+- Multi-Resume Comparison
+- AI Cover Letter Generator
+- Company-specific Interview Preparation
+- Live Job API Integration
+- Resume Version Tracking
+- AI Career Progress Dashboard
 
-Developed for the **KartiLine Agentic AI Hackathon 2026**.
+---
 
+# 👩‍💻 Author
+
+**Kaviya B**
+
+- GitHub: https://github.com/Kaviya-Balamurugan
+- LinkedIn: https://www.linkedin.com/in/kaviyabalamurugan
+
+---
+
+# ⭐ If you like this project
+
+Please consider giving the repository a **Star ⭐**.
