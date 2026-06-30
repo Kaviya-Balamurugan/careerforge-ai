@@ -11,6 +11,7 @@ import ATS from "./components/ATS";
 import Assistant from "./components/Assistant";
 import Interview from "./components/Interview";
 
+const API = import.meta.env.VITE_API_URL;
 
 function App() {
   const [file, setFile] = useState(null);
@@ -63,15 +64,15 @@ function App() {
 
     // Upload Resume
     const uploadResponse = await axios.post(
-      "https://careerforge-backend.onrender.com/upload-resume",
-      formData
-    );
+  `${API}/upload-resume`,
+  formData
+);
 
     const filename = uploadResponse.data.filename;
     setUploadedFilename(filename);
 
     const response = await axios.post(
-      "https://careerforge-backend.onrender.com/agent",
+  `${API}/agent`,
       null,
       {
         params: {
@@ -156,7 +157,7 @@ console.log(response.data.results);
     }
     // ================= ATS =================
 const atsResponse = await axios.get(
-  "https://careerforge-backend.onrender.com/ats-score",
+  `${API}/ats-score`,
   {
     params: {
       filename: filename,
@@ -168,7 +169,7 @@ setAts(atsResponse.data);
 
 // ================= Career Summary =================
 const summaryResponse = await axios.get(
-  "https://careerforge-backend.onrender.com/career-summary",
+  `${API}/career-summary`,
   {
     params: {
       filename: filename,
@@ -181,7 +182,7 @@ setSummary(summaryResponse.data);
 
 // ================= Jobs =================
 const jobsResponse = await axios.get(
-  "https://careerforge-backend.onrender.com/job-recommendations",
+  `${API}/job-recommendations`,
   {
     params: {
       filename: filename,
@@ -194,7 +195,7 @@ setJobs(jobsResponse.data);
 
 // ================= Interview Questions =================
 const interviewResponse = await axios.get(
-  "https://careerforge-backend.onrender.com/interview-questions",
+  `${API}/interview-questions`,
   {
     params: {
       filename: filename,
@@ -212,7 +213,7 @@ if (questions.length > 0) {
 }
 // ================= Rewrite Resume =================
 const rewriteResponse = await axios.post(
-  "https://careerforge-backend.onrender.com/rewrite-resume",
+  `${API}/rewrite-resume`,
   null,
   {
     params: {
@@ -227,7 +228,7 @@ setRewrittenResume(rewriteResponse.data.resume);
     if (jobDescription.trim() !== "") {
 
       const jdResponse = await axios.post(
-    "https://careerforge-backend.onrender.com/jd-match",
+    `${API}/jd-match`,
     null,
     {
         params: {
@@ -253,7 +254,7 @@ setJdMatch(jdResponse.data);
   const generateInterviewQuestions = async () => {
   try {
     const response = await axios.get(
-    "https://careerforge-backend.onrender.com/interview-questions",
+    `${API}/interview-questions`,
     {
         params: {
             filename: uploadedFilename,
@@ -277,7 +278,7 @@ setJdMatch(jdResponse.data);
 const evaluateAnswer = async () => {
   try {
     const response = await axios.post(
-      "https://careerforge-backend.onrender.com/evaluate-answer",
+      `${API}/evaluate-answer`,
       null,
       {
         params: {
@@ -309,7 +310,7 @@ console.log("Sending request...");
   try {
 
     const response = await axios.post(
-  "https://careerforge-backend.onrender.com/resume-chat",
+  `${API}/resume-chat`,
   null,
   {
     params: {
@@ -360,7 +361,7 @@ const quickPrompt = async (prompt) => {
   try {
 
     const response = await axios.post(
-      "https://careerforge-backend.onrender.com/resume-chat",
+      `${API}/resume-chat`,
       null,
       {
         params: {
@@ -393,7 +394,7 @@ const rewriteResume = async () => {
   try {
 
     const response = await axios.post(
-      "https://careerforge-backend.onrender.com/rewrite-resume",
+      `${API}/rewrite-resume`,
       null,
       {
         params: {
