@@ -20,7 +20,7 @@ from app.services.resource_recommender import get_resources
 
 def execute_plan(goal, filename, role):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     memory = AgentMemory()
     results = {}

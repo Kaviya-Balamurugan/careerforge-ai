@@ -70,7 +70,7 @@ async def upload_resume(file: UploadFile = File(...)):
 @app.get("/extract-text")
 def extract_text(filename: str):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     text = extract_resume_text(file_path)
 
