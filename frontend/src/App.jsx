@@ -75,10 +75,10 @@ function App() {
       null,
       {
         params: {
-          filename,
-          role,
-          goal: `Help me become a ${role}`,
-        },
+    filename: filename,
+    role: role,
+    goal: `Help me become a ${role}`,
+}
       }
     );
 
@@ -154,21 +154,90 @@ console.log(response.data.results);
         data.rewritten_resume
       );
     }
+    // ================= ATS =================
+const atsResponse = await axios.get(
+  "http://127.0.0.1:8000/ats-score",
+  {
+    params: {
+      filename: filename,
+    },
+  }
+);
+
+setAts(atsResponse.data);
+
+// ================= Career Summary =================
+const summaryResponse = await axios.get(
+  "http://127.0.0.1:8000/career-summary",
+  {
+    params: {
+      filename: filename,
+      role: role,
+    },
+  }
+);
+
+setSummary(summaryResponse.data);
+
+// ================= Jobs =================
+const jobsResponse = await axios.get(
+  "http://127.0.0.1:8000/job-recommendations",
+  {
+    params: {
+      filename: filename,
+      role: role,
+    },
+  }
+);
+
+setJobs(jobsResponse.data);
+
+// ================= Interview Questions =================
+const interviewResponse = await axios.get(
+  "http://127.0.0.1:8000/interview-questions",
+  {
+    params: {
+      filename: filename,
+      role: role,
+    },
+  }
+);
+
+const questions = interviewResponse.data.questions || [];
+
+setInterviewQuestions(questions);
+
+if (questions.length > 0) {
+    setSelectedQuestion(questions[0]);
+}
+// ================= Rewrite Resume =================
+const rewriteResponse = await axios.post(
+  "http://127.0.0.1:8000/rewrite-resume",
+  null,
+  {
+    params: {
+      filename: filename,
+      role: role,
+    },
+  }
+);
+
+setRewrittenResume(rewriteResponse.data.resume);
 
     if (jobDescription.trim() !== "") {
 
       const jdResponse = await axios.post(
-        "http://127.0.0.1:8000/jd-match",
-        null,
-        {
-          params: {
-            filename,
+    "http://127.0.0.1:8000/jd-match",
+    null,
+    {
+        params: {
+            filename: filename,
             job_description: jobDescription,
-          },
-        }
-      );
+        },
+    }
+);
 
-      setJdMatch(jdResponse.data);
+setJdMatch(jdResponse.data);
     }
 
   } catch (error) {
@@ -184,13 +253,14 @@ console.log(response.data.results);
   const generateInterviewQuestions = async () => {
   try {
     const response = await axios.get(
-      "http://127.0.0.1:8000/interview-questions",
-      {
+    "http://127.0.0.1:8000/interview-questions",
+    {
         params: {
-          role,
+            filename: uploadedFilename,
+            role: role,
         },
-      }
-    );
+    }
+);
 
     setInterviewQuestions(response.data.questions);
 
@@ -231,20 +301,24 @@ const askResumeAI = async () => {
 
   setLoading(true);
   setIsTyping(true);
+  console.log("Filename:", uploadedFilename);
+console.log("Role:", role);
+console.log("Question:", chatQuestion);
+console.log("Sending request...");
 
   try {
 
     const response = await axios.post(
-      "http://127.0.0.1:8000/resume-chat",
-      null,
-      {
-        params: {
-          filename: uploadedFilename,
-          question: chatQuestion,
-        },
-      }
-    );
-
+  "http://127.0.0.1:8000/resume-chat",
+  null,
+  {
+    params: {
+      filename: uploadedFilename,
+      role: role,
+      question: chatQuestion,
+    },
+  }
+);
     const aiAnswer = response.data.answer;
 
     setChatHistory((prev) => [
@@ -290,9 +364,10 @@ const quickPrompt = async (prompt) => {
       null,
       {
         params: {
-          filename: uploadedFilename,
-          question: prompt,
-        },
+    filename: uploadedFilename,
+    role: role,
+    question: prompt,
+}
       }
     );
 
@@ -395,14 +470,16 @@ const rewriteResume = async () => {
 
     y += 10;
 
-    if (projects) {
-      projects.recommended_projects.forEach(
-        (project) => {
-          doc.text(`• ${project}`, 25, y);
-          y += 8;
-        }
-      );
-    }
+    if (
+  projects &&
+  projects.recommended_projects &&
+  projects.recommended_projects.length > 0
+) {
+  projects.recommended_projects.forEach((project) => {
+    doc.text(`• ${project}`, 25, y);
+    y += 8;
+  });
+}
 
     y += 10;
 
@@ -414,15 +491,15 @@ const rewriteResume = async () => {
 
     y += 10;
 
-    if (suggestions) {
-      suggestions.suggestions.forEach(
-        (suggestion) => {
-          doc.text(`• ${suggestion}`, 25, y);
-          y += 8;
-        }
-      );
-      
-    }
+    if (
+  suggestions &&
+  suggestions.suggestions
+) {
+    suggestions.suggestions.forEach((suggestion) => {
+        doc.text(`• ${suggestion}`, 25, y);
+        y += 8;
+    });
+}
 
     y += 10;
 
@@ -460,7 +537,7 @@ doc.text(
 
 y += 10;
 
-if (jdMatch) {
+if (jdMatch && jdMatch.missing_skills) {
 
   doc.text(
     `Match Score: ${jdMatch.match_score}%`,

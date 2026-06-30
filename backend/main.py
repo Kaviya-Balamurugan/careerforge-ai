@@ -233,8 +233,10 @@ def project_recommendations(
     )
 
     projects = get_projects(
-        gap_result["missing_skills"]
-    )
+    current_skills,
+    gap_result["missing_skills"],
+    role
+)
 
     return {
         "recommended_projects": projects
@@ -335,14 +337,26 @@ def ats_score(filename: str):
 
     resume_text = extract_resume_text(file_path)
 
-    result = analyze_ats(resume_text)
+    result = analyze_ats(
+    resume_text,
+)
 
     return result
 
 @app.get("/interview-questions")
-def interview_questions(role: str):
+def interview_questions(
+    filename: str,
+    role: str
+):
 
-    questions = generate_questions(role)
+    file_path = f"backend/uploads/{filename}"
+
+    resume_text = extract_resume_text(file_path)
+
+    questions = generate_questions(
+        role,
+        resume_text
+    )
 
     return {
         "questions": questions
@@ -400,6 +414,7 @@ def jd_match(
 @app.post("/resume-chat")
 def resume_chat(
     filename: str,
+    role: str,
     question: str
 ):
 
@@ -408,9 +423,10 @@ def resume_chat(
     resume_text = extract_resume_text(file_path)
 
     response = chat_with_resume(
-        resume_text,
-        question
-    )
+    resume_text,
+    role,
+    question
+)
 
     return {
         "answer": response
