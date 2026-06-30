@@ -46,7 +46,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_DIR = "backend/uploads"
+UPLOAD_DIR = "uploads"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -85,7 +85,7 @@ def extract_text(filename: str):
 @app.get("/extract-skills")
 def get_skills(filename: str):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -111,7 +111,7 @@ def analyze_role(role: str):
 @app.get("/skill-gap")
 def skill_gap(filename: str, role: str):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -149,7 +149,7 @@ def skill_gap(filename: str, role: str):
 @app.get("/roadmap")
 def roadmap(filename: str, role: str):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -179,7 +179,7 @@ def roadmap(filename: str, role: str):
 @app.get("/learning-plan")
 def learning_plan(filename: str, role: str):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -216,7 +216,7 @@ def project_recommendations(
 ):
     
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -248,7 +248,7 @@ def career_summary(
     role: str
 ):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -282,7 +282,7 @@ def job_recommendations(
     role: str
 ):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -303,7 +303,7 @@ def resume_suggestions(
     role: str
 ):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -333,7 +333,7 @@ def resume_suggestions(
 @app.get("/ats-score")
 def ats_score(filename: str):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -349,7 +349,7 @@ def interview_questions(
     role: str
 ):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -390,7 +390,7 @@ def jd_match(
     job_description: str
 ):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(
         file_path
@@ -418,7 +418,7 @@ def resume_chat(
     question: str
 ):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -438,7 +438,7 @@ def rewrite_resume_api(
     role: str
 ):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
@@ -457,7 +457,7 @@ def resume_score(
     role: str
 ):
 
-    file_path = f"backend/uploads/{filename}"
+    file_path = f"uploads/{filename}"
 
     resume_text = extract_resume_text(file_path)
 
