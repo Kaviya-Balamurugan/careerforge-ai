@@ -1,4 +1,4 @@
-from backend.app.services.skill_extractor import extract_skills
+from app.services.skill_extractor import extract_skills
 
 def analyze_resume_score(resume_text, role):
 

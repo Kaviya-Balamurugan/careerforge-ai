@@ -1,33 +1,33 @@
 from fastapi import FastAPI, UploadFile, File
 
-from backend.app.services.agent_planner import create_plan
-from backend.app.services.agent_executor import execute_plan
+from app.services.agent_planner import create_plan
+from app.services.agent_executor import execute_plan
 
 import shutil
 import os
 
-from backend.app.services.resume_parser import extract_resume_text
-from backend.app.services.skill_extractor import extract_skills
-from backend.app.services.ai_role_analyzer import get_required_skills
-from backend.app.services.gap_analyzer import analyze_skill_gap
-from backend.app.services.roadmap_generator import generate_roadmap
-from backend.app.services.resource_recommender import get_resources
-from backend.app.services.project_recommender import get_projects
+from app.services.resume_parser import extract_resume_text
+from app.services.skill_extractor import extract_skills
+from app.services.ai_role_analyzer import get_required_skills
+from app.services.gap_analyzer import analyze_skill_gap
+from app.services.roadmap_generator import generate_roadmap
+from app.services.resource_recommender import get_resources
+from app.services.project_recommender import get_projects
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.services.career_summary import generate_career_summary
-from backend.app.services.job_recommender import get_job_recommendations
-from backend.app.services.resume_improver import get_resume_suggestions
-from backend.app.services.ats_analyzer import analyze_ats
-from backend.app.services.ai_interview_generator import generate_questions
-from backend.app.services.career_chatbot import career_chat
-from backend.app.services.jd_matcher import match_resume_with_jd
-from backend.app.services.answer_evaluator import evaluate_answer
-from backend.app.services.ai_service import ask_ai
-from backend.app.services.resume_chat import chat_with_resume
-from backend.app.services.resume_rewriter import rewrite_resume
-from backend.app.services.role_cache import role_skill_cache
-from backend.app.services.ai_readiness import evaluate_readiness
-from backend.app.services.resume_score import analyze_resume_score
+from app.services.career_summary import generate_career_summary
+from app.services.job_recommender import get_job_recommendations
+from app.services.resume_improver import get_resume_suggestions
+from app.services.ats_analyzer import analyze_ats
+from app.services.ai_interview_generator import generate_questions
+from app.services.career_chatbot import career_chat
+from app.services.jd_matcher import match_resume_with_jd
+from app.services.answer_evaluator import evaluate_answer
+from app.services.ai_service import ask_ai
+from app.services.resume_chat import chat_with_resume
+from app.services.resume_rewriter import rewrite_resume
+from app.services.role_cache import role_skill_cache
+from app.services.ai_readiness import evaluate_readiness
+from app.services.resume_score import analyze_resume_score
 
 app = FastAPI()
 

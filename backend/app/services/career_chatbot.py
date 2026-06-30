@@ -1,4 +1,4 @@
-from backend.app.services.role_analyzer import get_required_skills
+from app.services.role_analyzer import get_required_skills
 
 def career_chat(user_message):
 

@@ -1,4 +1,4 @@
-from backend.app.services.ai_service import ask_ai
+from app.services.ai_service import ask_ai
 import json
 
 def analyze_ats(resume_text):

@@ -1,5 +1,5 @@
 import json
-from backend.app.services.ai_service import ask_ai
+from app.services.ai_service import ask_ai
 
 
 def evaluate_readiness(resume_text, role):

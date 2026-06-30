@@ -1,4 +1,4 @@
-from backend.app.services.ai_service import ask_ai
+from app.services.ai_service import ask_ai
 
 def rewrite_resume(resume_text, role):
 
