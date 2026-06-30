@@ -32,15 +32,12 @@ from app.services.resume_score import analyze_resume_score
 app = FastAPI()
 
 
-@app.get("/test-ai")
-def test_ai():
-    return {
-        "response": ask_ai("Say Hello")
-    }
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://your-app-name.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
