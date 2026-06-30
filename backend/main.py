@@ -36,7 +36,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://your-app-name.vercel.app",
+        "https://careerforge-ai-kaviya.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
