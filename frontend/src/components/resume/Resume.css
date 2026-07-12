@@ -1,0 +1,169 @@
+.resume-page{
+
+    color:white;
+
+    padding:30px;
+
+}
+
+.upload-box{
+
+    background:#1E293B;
+
+    border:2px dashed #3B82F6;
+
+    border-radius:20px;
+
+    padding:60px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.upload-box:hover{
+
+    transform:translateY(-4px);
+
+    border-color:#60A5FA;
+
+}
+
+.drag-active{
+
+    background:#0F172A;
+
+    border-color:#22C55E;
+
+}
+
+.upload-box h2{
+
+    margin-bottom:15px;
+
+}
+
+.upload-box p{
+
+    color:#CBD5E1;
+
+}
+
+.upload-box small{
+
+    color:#94A3B8;
+
+}
+.file-card{
+
+    margin-top:30px;
+
+    background:#1E293B;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+}
+
+.file-icon{
+
+    font-size:45px;
+
+    color:#EF4444;
+
+}
+
+.file-info{
+
+    flex:1;
+
+    margin-left:20px;
+
+}
+
+.file-info h3{
+
+    margin-bottom:6px;
+
+}
+
+.file-info p{
+
+    color:#CBD5E1;
+
+}
+
+.file-info small{
+
+    color:#94A3B8;
+
+}
+
+.file-status{
+
+    background:#22C55E;
+
+    color:white;
+
+    padding:8px 18px;
+
+    border-radius:30px;
+
+    font-weight:bold;
+
+}
+.resume-actions{
+
+    margin-top:30px;
+
+    display:flex;
+
+    justify-content:center;
+
+}
+
+.primary-btn{
+
+    background:#2563EB;
+
+    color:white;
+
+    border:none;
+
+    padding:14px 30px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    transition:.3s;
+
+}
+
+.primary-btn:hover{
+
+    background:#1D4ED8;
+
+}
+
+.primary-btn:disabled{
+
+    background:gray;
+
+    cursor:not-allowed;
+
+}

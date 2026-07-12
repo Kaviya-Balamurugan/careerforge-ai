@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+
+from app.security.dependencies import get_current_user
 
 from app.services.ai_role_analyzer import get_required_skills
 from app.services.gap_analyzer import analyze_skill_gap
@@ -8,6 +10,7 @@ from app.services.role_cache import role_skill_cache
 from app.services.ai_readiness import evaluate_readiness
 from app.services.career_summary import generate_career_summary
 from app.services.career_chatbot import career_chat
+
 from app.utils.resume_loader import load_resume
 
 router = APIRouter()
@@ -26,42 +29,16 @@ def analyze_role(role: str):
 
 
 @router.get("/skill-gap")
-def skill_gap(filename: str, role: str):
+def skill_gap(
+    filename: str,
+    role: str,
+    current_user: dict = Depends(get_current_user)
+):
 
-    _, resume_text, current_skills = load_resume(filename)
-
-    if role not in role_skill_cache:
-        role_skill_cache[role] = get_required_skills(role)
-
-    required_skills = role_skill_cache[role]
-
-    result = analyze_skill_gap(
-        current_skills,
-        required_skills
+    _, resume_text, current_skills = load_resume(
+        filename,
+        current_user["user_id"]
     )
-
-    ai_result = evaluate_readiness(
-        resume_text,
-        role
-    )
-
-    return {
-        "role": role,
-        "current_skills": current_skills,
-        "required_skills": required_skills,
-        "matched_skills": result["matched_skills"],
-        "missing_skills": result["missing_skills"],
-        "readiness_score": ai_result["score"],
-        "strengths": ai_result["strengths"],
-        "weaknesses": ai_result["weaknesses"],
-        "recommendation": ai_result["recommendation"]
-    }
-
-
-@router.get("/roadmap")
-def roadmap(filename: str, role: str):
-
-    _, resume_text, current_skills = load_resume(filename)
 
     if role not in role_skill_cache:
         role_skill_cache[role] = get_required_skills(role)
@@ -73,21 +50,87 @@ def roadmap(filename: str, role: str):
         required_skills
     )
 
+    ai_result = evaluate_readiness(
+        resume_text,
+        role
+    )
+
+    return {
+
+        "role": role,
+
+        "current_skills": current_skills,
+
+        "required_skills": required_skills,
+
+        "matched_skills": gap_result["matched_skills"],
+
+        "missing_skills": gap_result["missing_skills"],
+
+        "readiness_score": ai_result["score"],
+
+        "strengths": ai_result["strengths"],
+
+        "weaknesses": ai_result["weaknesses"],
+
+        "recommendation": ai_result["recommendation"]
+
+    }
+
+
+@router.get("/roadmap")
+def roadmap(
+    filename: str,
+    role: str,
+    current_user: dict = Depends(get_current_user)
+):
+
+    _, resume_text, current_skills = load_resume(
+        filename,
+        current_user["user_id"]
+    )
+
+    if role not in role_skill_cache:
+        role_skill_cache[role] = get_required_skills(role)
+
+    required_skills = role_skill_cache[role]
+
+    gap_result = analyze_skill_gap(
+        current_skills,
+        required_skills
+    )
+
+    ai_result = evaluate_readiness(
+        resume_text,
+        role
+    )
+
     roadmap = generate_roadmap(
         gap_result["missing_skills"]
     )
 
     return {
+
         "role": role,
-        "readiness_score": gap_result["readiness_score"],
+
+        "readiness_score": ai_result["score"],
+
         "roadmap": roadmap
+
     }
 
 
 @router.get("/learning-plan")
-def learning_plan(filename: str, role: str):
+def learning_plan(
+    filename: str,
+    role: str,
+    current_user: dict = Depends(get_current_user)
+):
 
-    _, resume_text, current_skills = load_resume(filename)
+    _, resume_text, current_skills = load_resume(
+        filename,
+        current_user["user_id"]
+    )
 
     if role not in role_skill_cache:
         role_skill_cache[role] = get_required_skills(role)
@@ -106,9 +149,13 @@ def learning_plan(filename: str, role: str):
     learning_plan = {}
 
     for week, skill in roadmap.items():
+
         learning_plan[week] = {
+
             "skill": skill,
+
             "resources": get_resources(skill)
+
         }
 
     return learning_plan
@@ -117,10 +164,14 @@ def learning_plan(filename: str, role: str):
 @router.get("/career-summary")
 def career_summary(
     filename: str,
-    role: str
+    role: str,
+    current_user: dict = Depends(get_current_user)
 ):
 
-    _, resume_text, current_skills = load_resume(filename)
+    _, resume_text, current_skills = load_resume(
+        filename,
+        current_user["user_id"]
+    )
 
     if role not in role_skill_cache:
         role_skill_cache[role] = get_required_skills(role)
@@ -132,15 +183,27 @@ def career_summary(
         required_skills
     )
 
+    ai_result = evaluate_readiness(
+        resume_text,
+        role
+    )
+
     summary = generate_career_summary(
+
         role,
-        gap_result["readiness_score"],
+
+        ai_result["score"],
+
         gap_result["matched_skills"],
+
         gap_result["missing_skills"]
+
     )
 
     return {
+
         "summary": summary
+
     }
 
 
@@ -150,5 +213,7 @@ def chat(message: str):
     reply = career_chat(message)
 
     return {
+
         "reply": reply
+
     }

@@ -35,12 +35,15 @@ class User(Base):
 
 
 # ---------------- RESUME ----------------
-
 class Resume(Base):
 
     __tablename__ = "resumes"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
 
     user_id = Column(
         Integer,
@@ -48,6 +51,11 @@ class Resume(Base):
     )
 
     filename = Column(String)
+
+    version = Column(
+        Integer,
+        default=1
+    )
 
     resume_text = Column(Text)
 
@@ -57,10 +65,7 @@ class Resume(Base):
     )
 
     user = relationship("User")
-
-
-# ---------------- ANALYSIS ----------------
-
+    
 class Analysis(Base):
 
     __tablename__ = "analyses"

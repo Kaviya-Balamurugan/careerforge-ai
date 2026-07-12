@@ -1,0 +1,27 @@
+.skill-chip{
+
+    display:inline-block;
+
+    padding:10px 18px;
+
+    border-radius:25px;
+
+    margin:8px;
+
+    color:white;
+
+    font-weight:600;
+
+}
+
+.success{
+
+    background:#22C55E;
+
+}
+
+.danger{
+
+    background:#EF4444;
+
+}

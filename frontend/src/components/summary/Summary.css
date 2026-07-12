@@ -1,0 +1,31 @@
+.summary-page{
+
+    padding:30px;
+
+}
+
+.summary-page h1{
+
+    margin-bottom:20px;
+
+    color:white;
+
+}
+
+.summary-card{
+
+    background:#1E293B;
+
+    color:white;
+
+    border-radius:16px;
+
+    padding:25px;
+
+    line-height:1.8;
+
+    font-size:17px;
+
+    border:1px solid #334155;
+
+}

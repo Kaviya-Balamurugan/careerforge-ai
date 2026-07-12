@@ -1,0 +1,31 @@
+.stats-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+
+    gap:25px;
+
+}
+
+.target-role{
+
+    color:white;
+
+    margin:20px 0;
+
+    font-size:22px;
+
+}
+
+.skill-container{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:12px;
+
+    margin-bottom:30px;
+
+}

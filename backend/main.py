@@ -36,6 +36,8 @@ from app.routers.interview_router import router as interview_router
 from app.routers.career_router import router as career_router
 from app.routers.jobs_router import router as jobs_router
 from app.routers.agent_router import router as agent_router
+from app.routers.analysis_router import router as analysis_router
+from app.routers.dashboard_router import router as dashboard_router
 
 app = FastAPI()
 app.include_router(auth_router)
@@ -45,6 +47,8 @@ app.include_router(interview_router)
 app.include_router(career_router)
 app.include_router(jobs_router)
 app.include_router(agent_router)
+app.include_router(analysis_router)
+app.include_router(dashboard_router)
 
 app.add_middleware(
     CORSMiddleware,

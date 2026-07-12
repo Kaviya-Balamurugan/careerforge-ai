@@ -1,0 +1,79 @@
+.rewrite-page{
+
+    padding:30px;
+
+    color:white;
+
+}
+
+.rewrite-btn{
+
+    margin-top:20px;
+
+    padding:14px 24px;
+
+    background:#2563EB;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+}
+
+.rewrite-btn:hover{
+
+    background:#1D4ED8;
+
+}
+
+.rewrite-output{
+
+    width:100%;
+
+    height:450px;
+
+    margin-top:30px;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    background:#1E293B;
+
+    color:white;
+
+    border:none;
+
+    resize:none;
+
+    line-height:1.7;
+
+}
+
+.rewrite-actions{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-top:20px;
+
+}
+
+.rewrite-actions button{
+
+    padding:12px 20px;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+}

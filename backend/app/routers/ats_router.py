@@ -8,7 +8,15 @@ from app.services.gap_analyzer import analyze_skill_gap
 from app.services.resume_improver import get_resume_suggestions
 from app.services.ats_analyzer import analyze_ats
 from app.services.jd_matcher import match_resume_with_jd
+from fastapi import Depends
+from sqlalchemy.orm import Session
 
+
+from app.database.database import get_db
+from app.database.crud import (
+    create_analysis,
+    get_resume_by_filename
+)
 router = APIRouter()
 
 
@@ -41,7 +49,11 @@ def resume_suggestions(
 
 
 @router.get("/ats-score")
-def ats_score(filename: str):
+def ats_score(
+    filename: str,
+    role: str,
+    db: Session = Depends(get_db)
+):
 
     _, resume_text, _ = load_resume(filename)
 

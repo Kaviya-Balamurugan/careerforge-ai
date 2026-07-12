@@ -12,11 +12,11 @@ def analyze_resume_score(resume_text, role):
     quality = int((technical + projects + experience + ats) / 4)
 
     return {
-        "overall_score": quality,
-        "technical_skills": technical,
-        "projects": projects,
-        "experience": experience,
-        "ats": ats,
-        "resume_quality": quality,
-        "summary": "Automatically generated using CareerForge AI."
-    }
+    "resume_score": quality,
+    "technical_skills": technical,
+    "projects": projects,
+    "experience": experience,
+    "ats": ats,
+    "summary": "Automatically generated using CareerForge AI."
+}
+    

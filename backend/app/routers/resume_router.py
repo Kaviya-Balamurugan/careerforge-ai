@@ -8,6 +8,14 @@ from app.services.resume_chat import chat_with_resume
 from app.services.resume_rewriter import rewrite_resume
 from app.services.resume_score import analyze_resume_score
 from app.utils.resume_loader import load_resume
+from sqlalchemy.orm import Session
+from fastapi import Depends
+
+from app.database.database import get_db
+from app.database.crud import create_resume
+from app.security.dependencies import get_current_user
+
+from app.security.dependencies import get_current_user
 
 router = APIRouter()
 
@@ -16,23 +24,83 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 @router.post("/upload-resume")
-async def upload_resume(file: UploadFile = File(...)):
+async def upload_resume(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
 
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    user_id = current_user["user_id"]
 
-    with open(file_path, "wb") as buffer:
+    # Create user folder
+    user_folder = os.path.join(
+        UPLOAD_DIR,
+        f"user_{user_id}"
+    )
+
+    os.makedirs(
+        user_folder,
+        exist_ok=True
+    )
+
+    # Extract filename and extension
+    filename = file.filename
+
+    name, extension = os.path.splitext(filename)
+
+    # Save resume in database (gets version number)
+    temp_path = os.path.join(
+        user_folder,
+        filename
+    )
+
+    with open(temp_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
+    resume_text = extract_resume_text(temp_path)
+
+    resume = create_resume(
+        db=db,
+        user_id=user_id,
+        filename=filename,
+        resume_text=resume_text
+    )
+
+    # Final filename with version
+    final_filename = f"{name}_v{resume.version}{extension}"
+
+    final_path = os.path.join(
+        user_folder,
+        final_filename
+    )
+
+    os.rename(
+        temp_path,
+        final_path
+    )
+
     return {
+
         "message": "Resume uploaded successfully",
-        "filename": file.filename
+
+        "resume_id": resume.id,
+
+        "version": resume.version,
+
+        "stored_as": final_filename
+
     }
 
-
 @router.get("/extract-text")
-def extract_text(filename: str):
+def extract_text(
+    filename: str,
+    current_user: dict = Depends(get_current_user)
+):
 
-    _, resume_text, _ = load_resume(filename)
+    _, resume_text, _ = load_resume(
+        filename,
+        current_user["user_id"]
+    )
 
     return {
         "filename": filename,
@@ -41,23 +109,32 @@ def extract_text(filename: str):
 
 
 @router.get("/extract-skills")
-def get_skills(filename: str):
+def get_skills(
+    filename: str,
+    current_user: dict = Depends(get_current_user)
+):
 
-    _, _, skills = load_resume(filename)
+    _, _, skills = load_resume(
+        filename,
+        current_user["user_id"]
+    )
 
     return {
         "skills": skills
     }
 
-
 @router.post("/resume-chat")
 def resume_chat(
     filename: str,
     role: str,
-    question: str
+    question: str,
+    current_user: dict = Depends(get_current_user)
 ):
 
-    _, resume_text, _ = load_resume(filename)
+    _, resume_text, _ = load_resume(
+        filename,
+        current_user["user_id"]
+    )
 
     response = chat_with_resume(
         resume_text,
@@ -73,10 +150,14 @@ def resume_chat(
 @router.post("/rewrite-resume")
 def rewrite_resume_api(
     filename: str,
-    role: str
+    role: str,
+    current_user: dict = Depends(get_current_user)
 ):
 
-    _, resume_text, _ = load_resume(filename)
+    _, resume_text, _ = load_resume(
+        filename,
+        current_user["user_id"]
+    )
 
     improved = rewrite_resume(
         resume_text,
@@ -91,10 +172,14 @@ def rewrite_resume_api(
 @router.get("/resume-score")
 def resume_score(
     filename: str,
-    role: str
+    role: str,
+    current_user: dict = Depends(get_current_user)
 ):
 
-    _, resume_text, _ = load_resume(filename)
+    _, resume_text, _ = load_resume(
+        filename,
+        current_user["user_id"]
+    )
 
     result = analyze_resume_score(
         resume_text,

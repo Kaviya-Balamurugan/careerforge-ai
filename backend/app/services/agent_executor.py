@@ -2,21 +2,14 @@ from app.services.resume_parser import extract_resume_text
 from app.services.skill_extractor import extract_skills
 from app.services.ai_role_analyzer import get_required_skills
 from app.services.gap_analyzer import analyze_skill_gap
-from app.services.resume_score import analyze_resume_score
-from app.services.career_summary import generate_career_summary
-from app.services.resume_improver import get_resume_suggestions
-from app.services.resume_rewriter import rewrite_resume
-from app.services.ats_analyzer import analyze_ats
-from app.services.roadmap_generator import generate_roadmap
-from app.services.project_recommender import get_projects
-from app.services.job_recommender import get_job_recommendations
-from app.services.ai_interview_generator import generate_questions
 
 from app.services.agent_memory import AgentMemory
 from app.services.agent_observer import observe
 from app.services.agent_decider import decide_next_step
 from app.services.agent_reflector import reflect
-from app.services.resource_recommender import get_resources
+
+from app.agent.executor import execute_tool
+
 
 def execute_plan(goal, filename, role):
 
@@ -47,13 +40,24 @@ def execute_plan(goal, filename, role):
 
     executed_tools = set()
 
+    state = {
+        "goal": goal,
+        "role": role,
+        "resume_text": resume_text,
+        "current_skills": current_skills,
+        "required_skills": required_skills,
+        "gap": gap,
+        "results": results,
+        "memory": memory
+    }
+
     while True:
 
         next_tool = decide_next_step(
-    goal,
-    memory.all(),
-    list(executed_tools)
-)
+            goal,
+            memory.all(),
+            list(executed_tools)
+        )
 
         print(f"\n🤖 Agent decided -> {next_tool}")
 
@@ -67,180 +71,36 @@ def execute_plan(goal, filename, role):
 
         executed_tools.add(next_tool)
 
-        if next_tool == "skill_gap":
+        try:
 
-            results["skill_gap"] = gap
-
-            memory.save(
-                "observation_skill_gap",
-                observe("Skill Gap", gap)
+            execute_tool(
+                next_tool,
+                state
             )
 
-        elif next_tool == "resume_score":
+        except Exception as e:
 
-            score = analyze_resume_score(
-                resume_text,
-                role
-            )
-
-            results["resume_score"] = score
-
-            memory.save("resume_score", score)
-
-            memory.save(
-                "observation_resume_score",
-                observe("Resume Score", score)
-            )
-
-        elif next_tool == "career_summary":
-
-            summary = generate_career_summary(
-                role,
-                gap["readiness_score"],
-                gap["matched_skills"],
-                gap["missing_skills"]
-            )
-
-            results["career_summary"] = summary
-
-            memory.save("career_summary", summary)
-
-            memory.save(
-                "observation_career_summary",
-                observe("Career Summary", summary)
-            )
-
-        elif next_tool == "resume_suggestions":
-
-            suggestions = get_resume_suggestions(
-                current_skills,
-                gap["missing_skills"]
-            )
-
-            results["resume_suggestions"] = suggestions
-
-            memory.save("resume_suggestions", suggestions)
-
-            memory.save(
-                "observation_resume_suggestions",
-                observe("Resume Suggestions", suggestions)
-            )
-
-        elif next_tool == "rewrite_resume":
-
-            rewritten = rewrite_resume(
-                resume_text,
-                role
-            )
-
-            results["rewritten_resume"] = rewritten
-
-            memory.save("rewritten_resume", rewritten)
-
-            memory.save(
-                "observation_rewrite_resume",
-                observe("Resume Rewrite", rewritten)
-            )
-
-        elif next_tool == "ats":
-
-            ats = analyze_ats(resume_text)
-
-            results["ats"] = ats
-
-            memory.save("ats", ats)
-
-            memory.save(
-                "observation_ats",
-                observe("ATS Analysis", ats)
-            )
-
-        elif next_tool == "roadmap":
-
-            roadmap = generate_roadmap(
-                gap["missing_skills"]
-            )
-
-            results["roadmap"] = roadmap
-
-            memory.save("roadmap", roadmap)
-
-            memory.save(
-                "observation_roadmap",
-                observe("Roadmap", roadmap)
-            )
-
-        elif next_tool == "projects":
-
-            projects = get_projects(
-                gap["missing_skills"]
-            )
-
-            results["projects"] = projects
-
-            memory.save("projects", projects)
-
-            memory.save(
-                "observation_projects",
-                observe("Projects", projects)
-            )
-
-        elif next_tool == "job_recommendations":
-
-            jobs = get_job_recommendations(
-    current_skills,
-    role
-)
-
-            results["jobs"] = jobs
-
-            memory.save("jobs", jobs)
-
-            memory.save(
-                "observation_jobs",
-                observe("Job Recommendations", jobs)
-            )
-
-        elif next_tool == "interview_questions":
-
-            questions = generate_questions(role)
-
-            results["interview_questions"] = questions
-
-            memory.save(
-                "interview_questions",
-                questions
-            )
-
-            memory.save(
-                "observation_interview_questions",
-                observe("Interview Questions", questions)
-            )
-        elif next_tool == "learning_plan":
-            
-            roadmap = generate_roadmap(
-                gap["missing_skills"]
-    )
-            
-            learning_plan = {}
-
-            for week, skill in roadmap.items():
-                learning_plan[week] = {
-            "skill": skill,
-            "resources": get_resources(skill)
-        }
-
-            results["learning_plan"] = learning_plan
-            
-            memory.save(
-        "learning_plan",
-        learning_plan
-    )
-
-        else:
-            print("Unknown tool:", next_tool)
+            print(f"❌ Tool Error: {e}")
             break
 
+        # Sync updated objects
+        results = state["results"]
+        memory = state["memory"]
+
+        # Observation
+        if next_tool in results:
+
+            observation = observe(
+                next_tool,
+                results[next_tool]
+            )
+
+            memory.save(
+                f"observation_{next_tool}",
+                observation
+            )
+
+        # Reflection
         reflection = reflect(
             goal,
             memory.all()
