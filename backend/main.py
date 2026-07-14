@@ -3,6 +3,9 @@ from fastapi import FastAPI, UploadFile, File
 from app.services.agent_planner import create_plan
 from app.services.agent_executor import execute_plan
 
+from app.database.database import Base, engine
+import app.database.models 
+
 import shutil
 import os
 
@@ -40,6 +43,7 @@ from app.routers.analysis_router import router as analysis_router
 from app.routers.dashboard_router import router as dashboard_router
 
 app = FastAPI()
+Base.metadata.create_all(bind=engine)
 app.include_router(auth_router)
 app.include_router(resume_router)
 app.include_router(ats_router)
