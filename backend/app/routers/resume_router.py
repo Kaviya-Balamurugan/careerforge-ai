@@ -16,7 +16,7 @@ from app.database.crud import create_resume
 from app.security.dependencies import get_current_user
 
 from app.security.dependencies import get_current_user
-
+from app.services.ats_feedback import generate_ats_feedback
 router = APIRouter()
 
 UPLOAD_DIR = "uploads"
@@ -187,3 +187,24 @@ def resume_score(
     )
 
     return result
+
+@router.get("/ats-feedback")
+def ats_feedback(
+    filename: str,
+    role: str,
+    current_user: dict = Depends(get_current_user)
+):
+
+    _, resume_text, _ = load_resume(
+        filename,
+        current_user["user_id"]
+    )
+
+    feedback = generate_ats_feedback(
+        resume_text,
+        role
+    )
+
+    return {
+        "feedback": feedback
+    }
