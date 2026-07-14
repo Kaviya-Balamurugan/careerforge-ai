@@ -54,12 +54,12 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://careerforge-ai-kaviya.vercel.app",
+        "https://careerforge-4lp53rh2v-kaviya-balamurugans-projects.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 UPLOAD_DIR = "uploads"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
