@@ -31,3 +31,12 @@ export const careerSummary=(filename,role)=>
         `/career-summary?filename=${filename}&role=${role}`
 
     );
+
+
+export const atsFeedback = (filename, role) =>
+
+    api.get(
+
+        `/ats-feedback?filename=${filename}&role=${role}`
+
+    );

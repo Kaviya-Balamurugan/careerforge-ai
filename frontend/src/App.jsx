@@ -32,24 +32,9 @@ function App() {
             {/* Default Route */}
 
             <Route
-
-                path="/"
-
-                element={
-
-                    isAuthenticated
-
-                        ?
-
-                        <Navigate to="/dashboard" replace />
-
-                        :
-
-                        <Navigate to="/login" replace />
-
-                }
-
-            />
+    path="/"
+    element={<Navigate to="/login" replace />}
+/>
 
             {/* Public Routes */}
 

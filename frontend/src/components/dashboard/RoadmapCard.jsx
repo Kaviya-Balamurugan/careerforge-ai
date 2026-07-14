@@ -1,45 +1,109 @@
-export default function RoadmapCard(){
+import { useEffect } from "react";
 
-    const roadmap=[
+import useCareer from "../../hooks/useCareer";
 
-        "TensorFlow",
+import { roadmap as getRoadmap } from "../../api/careerApi";
 
-        "PyTorch",
+export default function RoadmapCard() {
 
-        "OpenCV"
+    const {
 
-    ];
+        filename,
 
-    return(
+        role,
+
+        roadmap,
+
+        setRoadmap
+
+    } = useCareer();
+
+    useEffect(() => {
+
+        async function loadRoadmap() {
+
+            if (!filename) return;
+
+            try {
+
+                const response = await getRoadmap(
+
+                    filename,
+
+                    role
+
+                );
+
+                setRoadmap(
+
+                    response.data
+
+                );
+
+            }
+
+            catch (err) {
+
+                console.error(err);
+
+            }
+
+        }
+
+        loadRoadmap();
+
+    }, [filename, role]);
+
+    return (
 
         <div className="roadmap-card">
 
             <h3>
 
-                Learning Roadmap
+                📚 Learning Roadmap
 
             </h3>
 
             {
 
-                roadmap.map((skill,index)=>(
+                roadmap?.roadmap
 
-                    <div key={index}>
+                ?
 
-                        Week {index+1}
+                Object.entries(roadmap.roadmap).map(
 
-                        —
+                    ([week, skill]) => (
 
-                        {skill}
+                        <div key={week}>
 
-                    </div>
+                            <strong>
 
-                ))
+                                {week}
+
+                            </strong>
+
+                            {" : "}
+
+                            {skill}
+
+                        </div>
+
+                    )
+
+                )
+
+                :
+
+                <p>
+
+                    No roadmap available.
+
+                </p>
 
             }
 
         </div>
 
-    )
+    );
 
 }

@@ -9,10 +9,10 @@ import {
     FaFileUpload,
     FaMagic,
     FaComments,
-    FaUserGraduate
+    FaUserGraduate,
+    FaSignOutAlt
 } from "react-icons/fa";
-
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate  } from "react-router-dom";
 
 const menuItems = [
 
@@ -88,6 +88,18 @@ const menuItems = [
 
 export default function Sidebar() {
 
+    const navigate = useNavigate();
+
+    function handleLogout() {
+
+    localStorage.removeItem("token");
+
+    localStorage.removeItem("resumeFilename");
+
+    navigate("/login", { replace: true });
+
+}
+
     return (
 
         <aside className="sidebar">
@@ -131,6 +143,15 @@ export default function Sidebar() {
                 }
 
             </nav>
+
+            <button
+    className="logout-btn"
+    onClick={handleLogout}
+    type="button"
+>
+    <FaSignOutAlt />
+    <span>Logout</span>
+</button>   
 
         </aside>
 

@@ -3,10 +3,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { resumeScore } from "../api/resumeApi";
 
 import {
-    skillGap,
-    roadmap,
-    learningPlan,
-    careerSummary
+    skillGap
 } from "../api/careerApi";
 
 const CareerContext = createContext();
@@ -33,6 +30,8 @@ export function CareerProvider({ children }) {
 
     const [careerSummaryData, setCareerSummary] = useState("");
 
+    const [atsFeedbackData, setAtsFeedback] = useState("");
+
     const [loading, setLoading] = useState(false);
 
     async function loadDashboard(file, targetRole) {
@@ -47,25 +46,13 @@ export function CareerProvider({ children }) {
 
                 resumeRes,
 
-                gapRes,
-
-                roadmapRes,
-
-                learningRes,
-
-                summaryRes
+                gapRes
 
             ] = await Promise.all([
 
                 resumeScore(file, targetRole),
 
-                skillGap(file, targetRole),
-
-                roadmap(file, targetRole),
-
-                learningPlan(file, targetRole),
-
-                careerSummary(file, targetRole)
+                skillGap(file, targetRole)
 
             ]);
 
@@ -78,12 +65,6 @@ export function CareerProvider({ children }) {
             });
 
             setSkillGap(gapRes.data);
-
-            setRoadmap(roadmapRes.data);
-
-            setLearningPlan(learningRes.data);
-
-            setCareerSummary(summaryRes.data.summary);
 
         }
 
@@ -100,9 +81,6 @@ export function CareerProvider({ children }) {
         }
 
     }
-
-    // Automatically load dashboard whenever
-    // filename or role changes
 
     useEffect(() => {
 
@@ -139,10 +117,16 @@ export function CareerProvider({ children }) {
                 skillGap: skillGapData,
 
                 roadmap: roadmapData,
+                setRoadmap,
 
                 learningPlan: learningPlanData,
+                setLearningPlan,
 
                 careerSummary: careerSummaryData,
+                setCareerSummary,
+
+                atsFeedback: atsFeedbackData,
+                setAtsFeedback,
 
                 loading,
 
