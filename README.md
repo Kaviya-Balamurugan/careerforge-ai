@@ -260,7 +260,3 @@ careerforge-ai/
 - LinkedIn: https://www.linkedin.com/in/kaviyabalamurugan
 
 ---
-
-# ⭐ If you like this project
-
-Please consider giving the repository a **Star ⭐**.
