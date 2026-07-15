@@ -57,9 +57,10 @@ app.include_router(dashboard_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        # "https://careerforge-ai-kaviya.vercel.app",
+        # "https://careerforge-38je935gl-kaviya-balamurugans-projects.vercel.app",
+        "https://careerforge-ai-kaviya-balamurugans-projects.vercel.app"
         "http://localhost:5173",
-        "https://careerforge-ai-kaviya.vercel.app",
-        "https://careerforge-4lp53rh2v-kaviya-balamurugans-projects.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
