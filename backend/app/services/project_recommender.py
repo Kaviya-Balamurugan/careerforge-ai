@@ -1,104 +1,96 @@
 PROJECTS = {
 
-    # AI / ML
-    "Python": [
-        "Student Performance Prediction",
-        "AI Resume Analyzer",
-        "Customer Churn Prediction"
+    "Python":[
+
+        {
+            "title":"AI Resume Analyzer",
+
+            "difficulty":"Intermediate",
+
+            "duration":"2 Weeks",
+
+            "tech_stack":[
+                "FastAPI",
+                "React",
+                "Python"
+            ],
+
+            "description":"Analyze resumes using AI.",
+
+            "career_value":"Very High"
+
+        },
+
+        {
+            "title":"Student Performance Prediction",
+
+            "difficulty":"Beginner",
+
+            "duration":"1 Week",
+
+            "tech_stack":[
+                "Python",
+                "Scikit-learn",
+                "Pandas"
+            ],
+
+            "description":"Predict student marks using ML.",
+
+            "career_value":"Medium"
+
+        }
+
     ],
 
-    "Machine Learning": [
-        "House Price Prediction",
-        "Credit Card Fraud Detection",
-        "Movie Recommendation System"
-    ],
-
-    "Deep Learning": [
-        "Brain Tumor Classification using CNN",
-        "Image Classification System",
-        "Face Mask Detection"
-    ],
-
-    "TensorFlow": [
-        "Handwritten Digit Recognition",
-        "Object Detection System"
-    ],
-
-    "PyTorch": [
-        "Medical Image Segmentation",
-        "Image Caption Generator",
-        "Neural Style Transfer"
-    ],
-
-    "Scikit-learn": [
-        "Spam Email Classifier",
-        "Customer Segmentation",
-        "Loan Approval Prediction"
-    ],
-
-    "NumPy": [
-        "Data Analysis Toolkit",
-        "Scientific Calculator using NumPy"
-    ],
-
-    "Pandas": [
-        "Sales Dashboard",
-        "Data Cleaning Automation Tool"
-    ],
-
-    "Statistics": [
-        "A/B Testing Analyzer",
-        "Business Analytics Dashboard"
-    ],
-
-    "OpenCV": [
-        "Face Recognition Attendance System",
-        "Vehicle Detection System",
-        "License Plate Recognition"
-    ],
-
-    "NLP": [
-        "Fake News Detection",
-        "Resume Screening AI",
-        "Sentiment Analysis"
-    ],
-
-    # Web
-
-    "React": [
-        "Portfolio Website",
-        "E-Commerce Website",
-        "Netflix Clone"
-    ],
-
-    "FastAPI": [
-        "AI Resume Analyzer API",
-        "Student Management API"
-    ],
-
-    "Docker": [
-        "Containerized ML Application"
-    ],
-
-    "LangGraph": [
-        "CareerForge AI",
-        "Multi-Agent Career Coach"
-    ],
 }
-
 
 def get_projects(skills):
 
-    projects = []
+    projects=[]
 
     for skill in skills:
-        projects.extend(PROJECTS.get(skill, []))
+
+        projects.extend(
+
+            PROJECTS.get(skill, [])
+
+        )
 
     if not projects:
-        projects = [
-            "AI Resume Analyzer",
-            "Career Recommendation System",
-            "AI Interview Assistant"
+
+        projects=[
+
+            {
+
+                "title":"AI Resume Analyzer",
+
+                "difficulty":"Intermediate",
+
+                "duration":"2 Weeks",
+
+                "tech_stack":[
+                    "FastAPI",
+                    "React"
+                ],
+
+                "description":"AI ATS Resume Analyzer",
+
+                "career_value":"Very High"
+
+            }
+
         ]
 
-    return list(dict.fromkeys(projects))
+    unique=[]
+
+    seen=set()
+
+    for p in projects:
+
+        if p["title"] not in seen:
+
+            unique.append(p)
+
+            seen.add(p["title"])
+
+    return unique

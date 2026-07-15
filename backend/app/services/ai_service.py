@@ -57,11 +57,12 @@ def ask_ai(prompt, temperature=0.7):
             time.sleep(5)
 
         except Exception as e:
-
-            print("\n========== AI ERROR ==========")
+            import traceback
+            
             traceback.print_exc()
-            print("==============================\n")
 
-            return f"ERROR: {str(e)}"
-
-    return "ERROR: Groq rate limit exceeded after 3 retries."
+            print("\n========== GROQ ERROR ==========")
+            print(repr(e))
+            print("================================\n")
+            
+            return f"ERROR: {repr(e)}"
