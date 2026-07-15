@@ -137,14 +137,14 @@ def resume_chat(
     )
 
     response = chat_with_resume(
-        resume_text,
-        role,
-        question
-    )
-
+    resume_text,
+    role,
+    question
+)
+    print("Router Chat:", repr(response))
     return {
-        "answer": response
-    }
+    "answer": response
+}
 
 
 @router.post("/rewrite-resume")
@@ -160,13 +160,14 @@ def rewrite_resume_api(
     )
 
     improved = rewrite_resume(
-        resume_text,
-        role
-    )
-
+    resume_text,
+    role
+)
+    print("Router Rewrite:", repr(improved))
+    
     return {
-        "resume": improved
-    }
+    "resume": improved
+}
 
 
 @router.get("/resume-score")

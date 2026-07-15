@@ -2,25 +2,39 @@ from app.services.ai_service import ask_ai
 
 def rewrite_resume(resume_text, role):
 
+    resume_text = resume_text[:5000]
+
     prompt = f"""
-You are an expert resume writer.
+You are an expert ATS Resume Writer.
 
 Target Role:
 {role}
 
-Rewrite the following resume professionally.
+Rewrite this resume professionally.
 
-Requirements:
+Rules:
 - Improve grammar.
-- Use powerful action verbs.
+- Improve formatting.
+- Use action verbs.
+- Keep facts unchanged.
 - Make it ATS friendly.
-- Improve project descriptions.
-- Keep the facts the same.
-- Do NOT invent experience.
 
 Resume:
 
 {resume_text}
 """
 
-    return ask_ai(prompt)
+    response = ask_ai(prompt)
+
+    print("\n===== REWRITE RESPONSE =====")
+    print(repr(response))
+    print("============================\n")
+
+    if (
+        not response
+        or response.startswith("ERROR")
+        or response.startswith("⚠️")
+    ):
+        return ""
+
+    return response

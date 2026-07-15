@@ -12,7 +12,7 @@ from app.services.career_summary import generate_career_summary
 from app.services.career_chatbot import career_chat
 
 from app.utils.resume_loader import load_resume
-
+from app.services.project_recommender import get_projects
 router = APIRouter()
 
 
@@ -159,6 +159,38 @@ def learning_plan(
         }
 
     return learning_plan
+
+@router.get("/projects")
+def projects(
+    filename: str,
+    role: str,
+    current_user: dict = Depends(get_current_user)
+):
+
+    _, resume_text, current_skills = load_resume(
+        filename,
+        current_user["user_id"]
+    )
+
+    if role not in role_skill_cache:
+        role_skill_cache[role] = get_required_skills(role)
+
+    required_skills = role_skill_cache[role]
+
+    gap_result = analyze_skill_gap(
+        current_skills,
+        required_skills
+    )
+
+    recommended_projects = get_projects(
+        gap_result["missing_skills"]
+    )
+
+    return {
+
+        "recommended_projects": recommended_projects
+
+    }
 
 
 @router.get("/career-summary")

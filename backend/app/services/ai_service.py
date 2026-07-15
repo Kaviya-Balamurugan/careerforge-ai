@@ -1,8 +1,10 @@
 import os
 import time
-from groq import Groq, RateLimitError
-from dotenv import load_dotenv
+import traceback
 import inspect
+
+from dotenv import load_dotenv
+from groq import Groq, RateLimitError
 
 load_dotenv()
 
@@ -11,32 +13,55 @@ client = Groq(
 )
 
 def ask_ai(prompt, temperature=0.7):
+
     caller = inspect.stack()[1].filename
-    print(f"\n========== AI CALL ==========")
+
+    print("\n========== AI CALL ==========")
     print(f"From: {caller}")
-    print(f"=============================\n")
-    for _ in range(3):
+    print(f"Prompt Length: {len(prompt)}")
+    print("=============================\n")
+
+    for attempt in range(3):
+
         try:
+
             response = client.chat.completions.create(
+
                 model="llama-3.3-70b-versatile",
+
                 messages=[
                     {
                         "role": "user",
                         "content": prompt
                     }
                 ],
+
                 temperature=temperature
+
             )
 
-            return response.choices[0].message.content
+            answer = response.choices[0].message.content
+
+            print("\n========== AI SUCCESS ==========")
+            print(answer[:500])
+            print("================================\n")
+
+            return answer
 
         except RateLimitError:
-            print("Groq rate limit reached. Retrying in 5 seconds...")
+
+            print(
+                f"Groq Rate Limit (Attempt {attempt+1}/3)"
+            )
+
             time.sleep(5)
-            
+
         except Exception as e:
-            import traceback
+
             print("\n========== AI ERROR ==========")
             traceback.print_exc()
             print("==============================\n")
+
             return f"ERROR: {str(e)}"
+
+    return "ERROR: Groq rate limit exceeded after 3 retries."
