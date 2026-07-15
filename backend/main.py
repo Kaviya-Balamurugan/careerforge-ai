@@ -54,14 +54,17 @@ app.include_router(agent_router)
 app.include_router(analysis_router)
 app.include_router(dashboard_router)
 
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "http://localhost:5173",
+    "https://careerforge-ai-kaviya.vercel.app",
+    "https://careerforge-38je935gl-kaviya-balamurugans-projects.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        # "https://careerforge-ai-kaviya.vercel.app",
-        # "https://careerforge-38je935gl-kaviya-balamurugans-projects.vercel.app",
-        "https://careerforge-ai-kaviya-balamurugans-projects.vercel.app"
-        "http://localhost:5173",
-    ],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
